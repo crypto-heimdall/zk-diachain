@@ -4,7 +4,7 @@ MAINTAINER 	crypto.heimdall@gmail.com
 # -- use bash always
 RUN		rm /bin/sh && ln -s /bin/bash /bin/sh
 
-RUN		apt-get update
+RUN		apt-get update && apt-get install -y --no-install-recommends apt-utils
 RUN		apt-get -y upgrade
 
 # 1.5 Basic utilities
@@ -37,7 +37,10 @@ RUN		git clone https://github.com/crypto-heimdall/ethsnarks-miximus.git
 WORKDIR		./ethsnarks-miximus
 
 RUN		make git-submodules
-RUN		make -C ethsnarks ubuntu-dependencies
-RUN		make -C ethsnarks python-dependencies
+WORKDIR		./ethsnarks
+#RUN		make -C ethsnarks ubuntu-dependencies
+RUN		apt -y install cmake make g++ libgmp-dev libboost-all-dev libprocps-dev python3-pip
+RUN		make python-dependencies
+WORKDIR		../
 #RUN		make
 
