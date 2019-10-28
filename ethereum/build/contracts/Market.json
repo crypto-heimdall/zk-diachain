@@ -1,0 +1,627 @@
+{
+  "contractName": "Market",
+  "abi": [
+    {
+      "inputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.5.8+commit.23d335f2\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/home/dsi/base/zk-diachain/ethereum/contracts/Market.sol\":\"Market\"},\"evmVersion\":\"petersburg\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/dsi/base/zk-diachain/ethereum/contracts/Market.sol\":{\"keccak256\":\"0xc042dee83d2d7fdc714af290043c492467218076b51a98f687b965b535487203\",\"urls\":[\"bzzr://df56fc5e844a42acdb689ad6135874fc3c0b9c4d6b233aeb1184855fdf29c5ad\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b50603580601d6000396000f3fe6080604052600080fdfea165627a7a723058204f0b4210082e9fa42ee65eb3dcc3c718d29cf5b269258d448ef148cf22b3420b0029",
+  "deployedBytecode": "0x6080604052600080fdfea165627a7a723058204f0b4210082e9fa42ee65eb3dcc3c718d29cf5b269258d448ef148cf22b3420b0029",
+  "sourceMap": "36:347:1:-;;;342:38;8:9:-1;5:2;;;30:1;27;20:12;5:2;342:38:1;36:347;;;;;;",
+  "deployedSourceMap": "36:347:1:-;;;;;",
+  "source": "pragma solidity >= 0.4.25 < 0.6.0;\n\ncontract Market {\n\n    enum DiaStatus {OnSale, OffSale, Rented}\n\n    struct OpenData {\n        string cut;\n        string color;\n        string clarity;\n        string carat;           // Public\n\n        string encGirdleCode;   // Private\n\n        uint32 price;\n        DiaStatus   status;     \n    }\n\n    constructor () public {\n        \n    }\n\n}",
+  "sourcePath": "/home/dsi/base/zk-diachain/ethereum/contracts/Market.sol",
+  "ast": {
+    "absolutePath": "/home/dsi/base/zk-diachain/ethereum/contracts/Market.sol",
+    "exportedSymbols": {
+      "Market": [
+        104
+      ]
+    },
+    "id": 105,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 80,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.4",
+          ".25",
+          "<",
+          "0.6",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:34:1"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 104,
+        "linearizedBaseContracts": [
+          104
+        ],
+        "name": "Market",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "Market.DiaStatus",
+            "id": 84,
+            "members": [
+              {
+                "id": 81,
+                "name": "OnSale",
+                "nodeType": "EnumValue",
+                "src": "75:6:1"
+              },
+              {
+                "id": 82,
+                "name": "OffSale",
+                "nodeType": "EnumValue",
+                "src": "83:7:1"
+              },
+              {
+                "id": 83,
+                "name": "Rented",
+                "nodeType": "EnumValue",
+                "src": "92:6:1"
+              }
+            ],
+            "name": "DiaStatus",
+            "nodeType": "EnumDefinition",
+            "src": "59:40:1"
+          },
+          {
+            "canonicalName": "Market.OpenData",
+            "id": 99,
+            "members": [
+              {
+                "constant": false,
+                "id": 86,
+                "name": "cut",
+                "nodeType": "VariableDeclaration",
+                "scope": 99,
+                "src": "131:10:1",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 85,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "131:6:1",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 88,
+                "name": "color",
+                "nodeType": "VariableDeclaration",
+                "scope": 99,
+                "src": "151:12:1",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 87,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "151:6:1",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 90,
+                "name": "clarity",
+                "nodeType": "VariableDeclaration",
+                "scope": 99,
+                "src": "173:14:1",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 89,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "173:6:1",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 92,
+                "name": "carat",
+                "nodeType": "VariableDeclaration",
+                "scope": 99,
+                "src": "197:12:1",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 91,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "197:6:1",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 94,
+                "name": "encGirdleCode",
+                "nodeType": "VariableDeclaration",
+                "scope": 99,
+                "src": "240:20:1",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 93,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "240:6:1",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 96,
+                "name": "price",
+                "nodeType": "VariableDeclaration",
+                "scope": 99,
+                "src": "284:12:1",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint32",
+                  "typeString": "uint32"
+                },
+                "typeName": {
+                  "id": 95,
+                  "name": "uint32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "284:6:1",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 98,
+                "name": "status",
+                "nodeType": "VariableDeclaration",
+                "scope": 99,
+                "src": "306:18:1",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_enum$_DiaStatus_$84",
+                  "typeString": "enum Market.DiaStatus"
+                },
+                "typeName": {
+                  "contractScope": null,
+                  "id": 97,
+                  "name": "DiaStatus",
+                  "nodeType": "UserDefinedTypeName",
+                  "referencedDeclaration": 84,
+                  "src": "306:9:1",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_enum$_DiaStatus_$84",
+                    "typeString": "enum Market.DiaStatus"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "OpenData",
+            "nodeType": "StructDefinition",
+            "scope": 104,
+            "src": "105:231:1",
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 102,
+              "nodeType": "Block",
+              "src": "364:16:1",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 103,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 100,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "354:2:1"
+            },
+            "returnParameters": {
+              "id": 101,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "364:0:1"
+            },
+            "scope": 104,
+            "src": "342:38:1",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 105,
+        "src": "36:347:1"
+      }
+    ],
+    "src": "0:383:1"
+  },
+  "legacyAST": {
+    "absolutePath": "/home/dsi/base/zk-diachain/ethereum/contracts/Market.sol",
+    "exportedSymbols": {
+      "Market": [
+        104
+      ]
+    },
+    "id": 105,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 80,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.4",
+          ".25",
+          "<",
+          "0.6",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:34:1"
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 104,
+        "linearizedBaseContracts": [
+          104
+        ],
+        "name": "Market",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "Market.DiaStatus",
+            "id": 84,
+            "members": [
+              {
+                "id": 81,
+                "name": "OnSale",
+                "nodeType": "EnumValue",
+                "src": "75:6:1"
+              },
+              {
+                "id": 82,
+                "name": "OffSale",
+                "nodeType": "EnumValue",
+                "src": "83:7:1"
+              },
+              {
+                "id": 83,
+                "name": "Rented",
+                "nodeType": "EnumValue",
+                "src": "92:6:1"
+              }
+            ],
+            "name": "DiaStatus",
+            "nodeType": "EnumDefinition",
+            "src": "59:40:1"
+          },
+          {
+            "canonicalName": "Market.OpenData",
+            "id": 99,
+            "members": [
+              {
+                "constant": false,
+                "id": 86,
+                "name": "cut",
+                "nodeType": "VariableDeclaration",
+                "scope": 99,
+                "src": "131:10:1",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 85,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "131:6:1",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 88,
+                "name": "color",
+                "nodeType": "VariableDeclaration",
+                "scope": 99,
+                "src": "151:12:1",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 87,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "151:6:1",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 90,
+                "name": "clarity",
+                "nodeType": "VariableDeclaration",
+                "scope": 99,
+                "src": "173:14:1",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 89,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "173:6:1",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 92,
+                "name": "carat",
+                "nodeType": "VariableDeclaration",
+                "scope": 99,
+                "src": "197:12:1",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 91,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "197:6:1",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 94,
+                "name": "encGirdleCode",
+                "nodeType": "VariableDeclaration",
+                "scope": 99,
+                "src": "240:20:1",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 93,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "240:6:1",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 96,
+                "name": "price",
+                "nodeType": "VariableDeclaration",
+                "scope": 99,
+                "src": "284:12:1",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint32",
+                  "typeString": "uint32"
+                },
+                "typeName": {
+                  "id": 95,
+                  "name": "uint32",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "284:6:1",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 98,
+                "name": "status",
+                "nodeType": "VariableDeclaration",
+                "scope": 99,
+                "src": "306:18:1",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_enum$_DiaStatus_$84",
+                  "typeString": "enum Market.DiaStatus"
+                },
+                "typeName": {
+                  "contractScope": null,
+                  "id": 97,
+                  "name": "DiaStatus",
+                  "nodeType": "UserDefinedTypeName",
+                  "referencedDeclaration": 84,
+                  "src": "306:9:1",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_enum$_DiaStatus_$84",
+                    "typeString": "enum Market.DiaStatus"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "OpenData",
+            "nodeType": "StructDefinition",
+            "scope": 104,
+            "src": "105:231:1",
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 102,
+              "nodeType": "Block",
+              "src": "364:16:1",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 103,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 100,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "354:2:1"
+            },
+            "returnParameters": {
+              "id": 101,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "364:0:1"
+            },
+            "scope": 104,
+            "src": "342:38:1",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 105,
+        "src": "36:347:1"
+      }
+    ],
+    "src": "0:383:1"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.5.8+commit.23d335f2.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.0.16",
+  "updatedAt": "2019-10-28T10:46:55.401Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}
