@@ -39,6 +39,10 @@ contract Market {
         return dias;
     }
 
+    function transitState (uint itemId, DiaStatus newStatus) public {
+        RegisteredDiaList[itemId].status = newStatus;
+    }
+
 /*
     function stateTransition(   bytes32 targetHashedDia, DiaStatus toStatus,
                                 bytes32 _anchor, // Merkle Root of NFT Tree..
