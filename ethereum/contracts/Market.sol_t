@@ -1,45 +1,27 @@
 pragma solidity >= 0.4.25 < 0.6.0;
-pragma experimental ABIEncoderV2;
 
 contract Market {
 
     enum DiaStatus {OnSale, OffSale, Rented}
 
     struct OpenData {
-
-        uint itemId;
-
         string cut;
         string color;
         string clarity;
         string carat;           // Public
 
-        uint32 price;
-        DiaStatus status;
-    }
-    uint private itemCount;
+        string encGirdleCode;   // Private
 
-    mapping (uint => OpenData) RegisteredDiaList;
+        uint32 price;
+        DiaStatus   status;     
+    }
+
+    mapping (bytes32 => OpenData) RegisteredDiaList;
 
     constructor () public {
-        itemCount = 0;
+        
     }
 
-    function register(string memory cut, string memory color, string memory clarity, string memory carat, uint32 price) public {
-        RegisteredDiaList[itemCount] = OpenData(itemCount, cut, color, clarity, carat, price, DiaStatus.OffSale);
-        itemCount++;
-    }
-
-    function getDiamonds () public view returns (OpenData[] memory) {
-        OpenData[] memory dias = new OpenData[](itemCount);
-        for (uint i = 0; i < itemCount; i++) {
-            OpenData storage dia = RegisteredDiaList[i];
-            dias[i] = dia;
-        }
-        return dias;
-    }
-
-/*
     function stateTransition(   bytes32 targetHashedDia, DiaStatus toStatus,
                                 bytes32 _anchor, // Merkle Root of NFT Tree..
                                 uint[8] memory points) public returns (bool) {
@@ -55,6 +37,5 @@ contract Market {
     function verify (bytes32 targetHash, uint[8] memory points) public {
         
     }
-*/
 
 }

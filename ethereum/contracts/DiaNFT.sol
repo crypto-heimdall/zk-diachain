@@ -1,127 +1,55 @@
-pragma solidity >=0.4.25 <0.6.0;
+pragma solidity >= 0.4.25 < 0.6.0;
 
-import "./ReportRegistry.sol";
+import "./verifier.sol";    // Verifier : Transfer Circuit
 
+contract DiaNFT is Verifier {
 
-contract DiaNFT {
-    //==== Anchor by AnchorRegistry =====//
-    bytes4 internal constant InterfaceId_AnchorRegistry = 0x04d466b2;
-  /*
-   * 0x04d466b2 ===
-   *   bytes4(keccak256('getAnchorById(bytes32)')) 
-   */
-    // Anchor Registry
-    address internal anchorRegisty_;
-    // The Ownable Anchor
-    struct OwnedAnchor {
-        bytes32 reportId;
-        bytes32 rootHash;
-    }
-    // Mapping from details to Report ID
-    mapping (uint256 => OwnedAnchor) internal reportDetails_;
+    enum State {OnSale, OffSale, InProgress}
+    mapping(bytes32 => State) public diamonds;
+    string[] public allDias;
+    bytes32[] public allHashedDias;
 
+    constructor() public {}
 
-    //ReportRegistry public   registry;   // check validity of requests for minting new DiaNFT
-    address internal registry;
+    function transferDia (  // its parameters depend on 'Proving Scheme of Zokrates'
+        uint[2] memory a, uint[2] memory a_p, uint[2][2] memory b, uint[2] memory b_p, uint[2] memory c, uint[2] memory c_p,
+        uint[2] memory h, uint[2] memory k, uint[7] memory input,   // int - 16bytes
+        string memory encryptedDia1, string memory encryptedDia2
+    ) public {
+        require (verifyTx(a, a_p, b, b_p, c, c_p, h, k, input), 'Invalid zk proof');
 
-    struct TokenData {
-        string      girdleCode; // public
-        bytes32     owner;      // private
-    }
-
-    mapping (bytes32 => TokenData) public data;
-
-    constructor (address _registry) public {
-        require (ReportRegistry(_registry).supportsInterface(InterfaceId_AnchorRegistry), "not a valid anchor registry");
-        registry = _registry;
+        bytes32 spendingDia = calcDiaHash(input[0], input[1]);  // input 은 각 int 즉 16 bytes (128bits)
+        diamonds[spendingDia] = State.InProgress;
         
+        bytes32 newDia1 = calcDiaHash(input[2], input[3]);
+        createDia(newDia1, encryptedDia1);
+        bytes32 newDia2 = calcDiaHash(input[4], input[5]);
+        createDia(newDia2, encryptedDia2);
     }
 
-    function reportRegistry () external view returns (address) {
-        return registry;
+    function createDia(bytes32 dia, string memory encryptedDia) internal {
+        diamonds[dia] = State.OffSale;
+        allDias.push(encryptedDia);
+        allHashedDias.push(dia);
     }
 
-    function checkAnchor(bytes32 _anchorId, bytes32 _droot, bytes32 _sigs) public returns (bool) {
-        bytes32 root;
-        (, root) = ReportRegistry(registry).getAnchorById (_anchorId);  //reportRoot - merkle root for precise proof of 'the Report'
-    
-        return root == sha256(concat(_droot, _sigs));   // Temp..
-    }
+    function calcDiaHash (uint _a, uint _b) internal pure returns (bytes32) {
+        bytes32 a = bytes32(_a);
+        bytes32 b = bytes32(_b);
+        bytes memory _note = new bytes(32);
 
-    function mint ( bytes32 _owner, string memory _girdleCode, 
-                    bytes32 _anchor, bytes32 _data_root, bytes32 _signature_root ) public returns (bytes32) {
-        // Check if the request has been registered in the anchor (ReportRegistry)
-        require (checkAnchor (_anchor, _data_root, _signature_root), "anchor-root-failed..");
-
-    }
-
-    // Temp for compiling the contract.... will be removed when verifier.sol is created by zokrates.
-    function verifyTx ( uint[2] memory a, uint[2][2] memory b, uint[2] memory c, 
-                        uint[5] memory input) public returns (bool) {
-        return true;
-    }
-
-
-
-    function verify ( bytes32 _data_root, string memory _girdleCode, uint[8] memory points) public {
-        // _girdleCode must be not empty..
-        require (bytes(_girdleCode).length != 0, "girdleCode must be not empty..");
-
-        uint[2] memory a = [points[0], points[1]];
-        uint[2][2] memory b = [[points[2], points[3]], [points[4], points[5]]];
-        uint[2] memory c = [points[6], points[7]];
-
-        // intputs :
-        uint[5] memory input;
-        bytes32 b_girdleCode = stringToBytes32(_girdleCode);
-        (input[0], input[1]) = unpack (b_girdleCode);
-        (input[2], input[3]) = unpack (_data_root);
-        input[4] = 1;
-
-        require (verifyTx (a,b,c, input), "failed to verify the proof..");
-
-    }
-
-    //----- Utils -----
-    function concat(bytes32 b1, bytes32 b2) pure internal returns (bytes memory) {
-        bytes memory result = new bytes(64);
-        assembly {
-            mstore (add(result, 32), b1)
-            mstore (add(result, 64), b2)
+        for (uint i=0; i < 16; i++) {
+            _note[i] = a[i];
+            _note[16+i] = b[i];
         }
-        return result;
+        return bytesToBytes32(_note,0);
     }
 
-    // code from http://bit.ly/2Py2ZB1
-    function stringToBytes32(string memory source) pure internal returns (bytes32 result) {
-        bytes memory tempEmptyStringTest = bytes(source);
-        if (tempEmptyStringTest.length == 0) {
-            return 0x0;
+    function bytesToBytes32(bytes memory b, uint offset) internal pure returns (bytes32) {
+        bytes32 out;
+        for (uint i=0; i<32; i++) {
+            out |= bytes32(b[offset+i] & 0xFF) >> (i*8);
         }
-
-        assembly {
-            result := mload(add(source, 32))
-        }
+        return out;
     }
-
-    // unpack - takes one bytes32 arg and turns it into two uint256 to make it fit into a field element
-    function unpack (bytes32 x) pure internal returns (uint, uint) {
-        bytes32 a = bytes32(x);
-        bytes32 b = (a >> 128);
-        bytes32 c = ((a << 128) >> 128);
-
-        return (uint(b), uint(c));
-    }
-
-
-
-/*
-    function checkReportValidity (string memory girdleCode, bytes32 droot, bytes32 sigs) view public returns (bool) {
-        bytes32 root;
-        (, root, ) = registry.getReportbyCode (girdleCode);
-        
-        return root == sha256(concat(droot, sigs));
-    }
-*/
-
 }
