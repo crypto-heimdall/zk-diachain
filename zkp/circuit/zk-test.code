@@ -1,0 +1,7 @@
+//def main() -> (field) :
+//    field a = 2
+//    return a
+def main(private field a, private field b, private field c, field d) -> (field) :
+    return a
+
+
