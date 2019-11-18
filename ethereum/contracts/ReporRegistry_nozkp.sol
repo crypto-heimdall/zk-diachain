@@ -1,46 +1,44 @@
 pragma solidity >= 0.4.25 < 0.6.0;
 pragma experimental ABIEncoderV2;
 
-contract Market {
+contract ReportRegistrtNozkp {
 
-    enum DiaStatus {OnSale, OffSale, Rented}
-
-    struct OpenData {
-
+    struct ReportInfo {
         uint itemId;
-
+        
+        string girdleCode;
         string cut;
         string color;
         string clarity;
-        string carat;           // Public
+        string carat;
+        string reportURI;   // 해당 Report 원본 URI
+        //bytes32 hashedReport;
 
-        uint32 price;
-        DiaStatus status;
+        address issuer;
+
     }
     uint private itemCount;
 
-    mapping (uint => OpenData) RegisteredDiaList;
+    mapping (uint => ReportInfo) RegisteredReport;
 
     constructor () public {
         itemCount = 0;
     }
 
-    function register(string memory cut, string memory color, string memory clarity, string memory carat, uint32 price) public {
-        RegisteredDiaList[itemCount] = OpenData(itemCount, cut, color, clarity, carat, price, DiaStatus.OffSale);
+    function register(string memory _girdlecode, string memory _cut, string memory _color,
+                    string memory _clarity, string memory _carat, string memory _reportURI,
+                    address _issuer) public {
+        RegisteredReport[itemCount] = ReportInfo(itemCount, _girdlecode, _cut, _color, _clarity, _carat, _reportURI, _issuer);
         itemCount++;
     }
 
-    function getDiamonds () public view returns (OpenData[] memory) {
-        OpenData[] memory dias = new OpenData[](itemCount);
+    function getReports () public view returns (ReportInfo[] memory) {
+        ReportInfo[] memory reports = new ReportInfo[](itemCount);
         for (uint i = 0; i < itemCount; i++) {
-            OpenData storage dia = RegisteredDiaList[i];
-            dias[i] = dia;
+            ReportInfo storage report = RegisteredReport[i];
+            reports[i] = report;
         }
-        return dias;
-    }
-
-    function transitState (uint itemId, DiaStatus newStatus) public {
-        RegisteredDiaList[itemId].status = newStatus;
+        return reports;
     }
 
 /*
