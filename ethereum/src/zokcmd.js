@@ -9,8 +9,8 @@ function getPublicZokratesParams(hexPayload) {  // payload - string with 128 lon
     const buf = Buffer.from(hexPayload, 'hex')
 
     const digest = crypto.createHash('sha256').update(buf).digest('hex')
-    console.log('Public-Zokrates', digest)  // 256 bits
-    return [digest.slice(0,32), digest.slice(32)]
+    console.log('Public-Zokrates', digest)  // 256 bits - 64 long in hex(4bits)
+    return [digest.slice(0,32), digest.slice(32)]   // 그럼 64 /2 = 32 반!! * 4bits 는 결국 128 bits 만큼 나눈다.
 }
 
 function getHexPayload(from, amount) {
@@ -44,6 +44,8 @@ function getTransferZkParams(from, fromAmount, to, toAmount) {
 
     let change = parseInt(fromAmount,16) - parseInt(toAmount, 16);
     // NoteParams : public param (보통 해시값 256 bits) + private param (해시값을 만든 거!)
+        // 다만 어디선가 본바에 따르면 ZoKrates 의 변수가 256 즉 32 bytes 가 안된다 그래서 Note Param에서 256 bits를 둘로 나눈다!!
+        // 나눈 값은 그럼.. zokrates 코드에서 뭐 sha256packed 에서 처리해주는 듯하다!!
     let params = getNoteParams(from, fromAmount).concat(getNoteParams(to, toAmount));
     console.log('leftOver')
     let leftOver = getNoteParams(from, change)
