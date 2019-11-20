@@ -179,4 +179,70 @@ async function transferNFToken () {
 
 }
 
-transferNFToken()
+//transferNFToken()
+
+const pp = require('./precise-proof')
+const report = {
+    cut : "shallow",
+    color : "D",
+    clarity : "VVS1",   // Verify, Verify Slightly Included 1
+    carat : "1.0",
+    girdleCode : "SAMI161203",
+    details : {
+        issuer : "0x",  // public key..
+        uri : "http://bit.ly/2CYyz3x",
+    },
+};
+
+function testPreciseProof(){
+    const demoinput = {
+        operationalSince: 0,
+        capacityWh: 10,
+        country: "Germany",
+        region: "Saxony",
+        active: true,
+        nestedObject: {
+            id: 1,
+            somedata: "hello",
+            ObjectInObjectInObject: {
+                id:2,
+                somedata: "there"
+            }
+        },
+        zip: "09648",
+        city: "Mittweida",
+        street: "Main Street",
+        houseNumber: "101",
+        gpsLatitude: "50.986783",
+        gpsLongitude: "12.980977",
+        listElement: [1, 3, 3]
+    };
+
+
+    const leafs = pp.PreciseProofs.createLeafs(demoinput) 
+    // value - key , value , salt , hash
+    /*
+    {   key: 'nestedObject',
+        value: '{"id":1,"somedata":"hello","ObjectInObjectInObject":{"id":2,"somedata":"there"}}',
+        salt: '8lvl+HoiXG9a0gaH',
+        hash: '22cd416028f65b6e3a067c98f6ee4814e0348aeba6b814a61f3a4d9a30fcaccd' }
+    */
+    let value = pp.PreciseProofs.findLeaf(leafs, "nestedObject")
+    console.log(value)
+    var json = JSON.parse(value.value)
+    console.log('nestedObject : ', json.id , json.somedata, json.ObjectInObjectInObject)
+
+    const merkleTree = pp.PreciseProofs.createMerkleTree(leafs.map((leaf) => leaf.hash))
+    const rootHash = merkleTree[merkleTree.length - 1][0]
+    const schema = leafs.map((leaf) => leaf.key)
+    //console.log(schema)
+    const extendedTreeHash = pp.PreciseProofs.createExtendedTreeRootHash(rootHash, schema)
+    const extendedProof = pp.PreciseProofs.createProof('street', leafs, true)
+    const result = pp.PreciseProofs.verifyProof(extendedTreeHash, extendedProof, schema);
+
+    console.log(result)
+        
+}
+
+testPreciseProof()
+
