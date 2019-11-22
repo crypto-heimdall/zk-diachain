@@ -1,13 +1,10 @@
-import { connect } from 'tls';
-
 const Web3 = require('web3');
 
-export default {
-    connection() {
+function  connection() {
         return this.web3;
-    },
+    }
 
-    connect() {
+function    connect() {
         if (this.web3) return this.web3.currentProvider;
         console.log('connection the testnet...');
 
@@ -19,12 +16,17 @@ export default {
         this.web3 = new Web3(provider);
         return provider;
 
-    },
+    }
 
-    isConnect() {
+function    isConnect() {
         if(this.web3) {
             return this.web3.eth.net.isListening();
         }
         return false;
-    },
+    }
+
+module.exports={
+    connection,
+    connect,
+    isConnect,
 };

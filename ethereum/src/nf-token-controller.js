@@ -6,7 +6,7 @@ const ele = require('./Element')
 const cv = require('./compute-vectors')
 
 const BN = require('bn.js')
-
+const Web3 = require('./web3')
 
 /**
  * Mint a commitment 
@@ -329,6 +329,17 @@ async function transferNFToken() {
 }
 
 mintNFToken()
+
+async function testConnectContract() {
+    const nfTokenShield = contract('./build/contracts/DiaNFT_Merkle.json');
+    nfTokenShield.setProvider(Web3.connect());
+    const nfTokenShieldInstance = await nfTokenShield.at('0x854aAC232B05c2BE1B29f65216fd4444Dab72b43');
+
+    console.log(nfTokenShieldInstance);
+}
+
+testConnectContract()
+
 
 const pp = require('./precise-proof')
 const report = {

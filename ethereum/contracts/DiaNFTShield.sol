@@ -54,8 +54,6 @@ contract DiaNFTShield {
         bytes31 publicInputHashCheck = bytes31(sha256(abi.encodePacked(_tokenId, _commitment)));
         require(publicInputHash == publicInputHashCheck, "publicInputHash cannot be reconciled");
 
-
-
         // verify the proof with _proof and _inputs
 
         // if correct, update contract states
