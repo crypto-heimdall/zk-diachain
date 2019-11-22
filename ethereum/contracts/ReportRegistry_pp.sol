@@ -55,4 +55,10 @@ contract ReportRegistry_pp is AnchorRegistry {
     function getAnchorById(string calldata _identifier) external view returns (string memory, bytes32) {
         return (_identifier, commitments[_identifier].merkleRoot);
     }
+/*  Is it needed??
+    function setAnchorById (string calldata _anchorId, bytes32 documentRoot) external payable {
+        commitments[_anchorId] = Commitment(documentRoot, "...");
+    }
+*/
+
 }

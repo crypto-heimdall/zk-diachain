@@ -1,6 +1,14 @@
 pragma solidity >= 0.4.25 < 0.6.0;
 
+import "./ReportRegistry_pp.sol";
+
 contract DiaNFTShield {
+
+    // Anchoring with ReportRegistry to check/bring Report's Precise-Proof Root!!
+    bytes4 internal constant InterfaceId_AnchorRegistry = 0x4d5222e1;
+    // Ancrho Registry..
+    address internal anchorRegistry_;
+
 
     uint constant merkleWidth = 4294967296; // 2^32
     uint constant merkleDepth = 33;
@@ -15,13 +23,38 @@ contract DiaNFTShield {
 
     event Mint(address from, address to, uint256 token_id, bytes32 commitment, uint256 commitment_index);
 
-    constructor() public {}
+    constructor(address _anchorRegistry) public {
+        require(ReportRegistry_pp(_anchorRegistry).supportsInterface(InterfaceId_AnchorRegistry), "Not a Valid Report Registry..");
+        anchorRegistry_ = _anchorRegistry;
+    }
 
-    function mint(uint256[] calldata _proof, uint256[] calldata _inputs, uint256 _tokenId, bytes32 _commitment) external {
+    // Check if a given girdlecode is registered in the anchor registry of this contract with the given documentRoot
+    function _isRegisteredInRegistered (string memory _girdlecode, bytes32 reportRoot) internal view returns (bool) {
+        ReportRegistry_pp registry = ReportRegistry_pp(anchorRegistry_);
+        (string memory identifier, bytes32 documentRoot) = registry.getAnchorById (_girdlecode);
+        // String comparision should be done via 'hashing..'
+        if ( keccak256(abi.encodePacked(identifier)) == keccak256( abi.encodePacked(_girdlecode)) && documentRoot != 0x00) {
+            return true;
+        }
+        return false;
+    }
+
+    // [!!!!!!!] external .. calldata vs memeory..?????
+    function mint(uint256[] calldata _proof, uint256[] calldata _inputs, uint256 _tokenId, bytes32 _commitment,
+                        string calldata _girdlecode, bytes32 reportRoot) external {
+        // Parameter checks!!
+        require(reportRoot != 0x0, "Report Root needs to be valid..");
+        require( bytes(_girdlecode).length != 0, "girdlecode needs to be valid..");
+        
+        // Check with Anchoring
+        require(_isRegisteredInRegistered(_girdlecode, reportRoot), "Report Root needs to be registered in the registry..");
+
         // Check that the publicInputHash equals the hash of the 'public inputs'
         bytes31 publicInputHash = bytes31(bytes32(_inputs[0])<<8);
         bytes31 publicInputHashCheck = bytes31(sha256(abi.encodePacked(_tokenId, _commitment)));
         require(publicInputHash == publicInputHashCheck, "publicInputHash cannot be reconciled");
+
+
 
         // verify the proof with _proof and _inputs
 

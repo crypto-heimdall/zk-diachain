@@ -5,6 +5,9 @@ const config = require('./config')
 const ele = require('./Element')
 const cv = require('./compute-vectors')
 
+const BN = require('bn.js')
+
+
 /**
  * Mint a commitment 
  * @param {Object} vkId - vkId for NFT's MintToken ..(Low Priority)
@@ -134,7 +137,41 @@ async function mintDia( tokenId, ownerPublicKey, salt, blockchainOptions) {
 }
 
 
-function transferDia() {
+async function transferDia(tokenID, receiverPublicKey, originalCommitmentSalt, newCommitmentSalt,
+                        senderSecretKey, commitment, commitmentIndex,
+                        blockchainOptions) {    // vkId
+
+    const {nfTokenShieldJson, nfTokenShieldAddress} = blockchainOptions;
+    const account = utils.ensure0x(blockchainOptions.account);
+
+    const nfTokenShield = contract(nfTokenShieldJson);
+    nfTokenShield.setProvider(Web3.connect());
+    const nfTokenShieldInstance = await nfTokenShield.at(nfTokenShieldAddress);
+
+    // Contract 연결!!
+    const nfTokenShield = contract(nfTokenShieldJson);
+    nfTokenShield.setProvider(Web3.connect());
+    const nfTokenShieldInstance = await nfTokenShield.at(nfTokenShieldAddress);
+
+    let A = await utils.rndHex(32);                                                     // tokenId
+    let B = await utils.rndHex(32);
+    let skA = '0x0000000000111111111111111111111111111111111111111111111111111111';     // senderSecretKey
+    let skB = '0x0000000000222222222222222222222222222222222222222222222222222222';
+    
+    let pkB = utils.ensure0x(utils.strip0x(utils.hash(skB)).padStart(32,'0'));          // receiverPublicKey
+    let pkA = utils.ensure0x(utils.strip0x(utils.hash(skA)).padStart(32,'0'));
+    console.log(pkB);
+
+    let S_A_A = await utils.rndHex(32);                                                 // originalCommitmentSalt
+    let sAToBA = await utils.rndHex(32);                                                // newCommitmentSalt
+    let Z_A_A = utils.concatenateThenHash(utils.strip0x(A).slice(-32 * 2), pkA, S_A_A); // commitment
+
+    let zIndA;                                                                          // commitment Index
+
+    // const Verifier 관련
+    // const Verifier = contract(jsonfile.readFileSync('./build/contracts/transfer_verifier.json));
+        // contract 는 truffle-contract npm 임
+    // Verifier.setProvider(Web3.connect())
 
 }
 
@@ -143,7 +180,7 @@ const skB = '0x0000000000222222222222222222222222222222222222222222222222222222'
 let pkA = utils.ensure0x(utils.strip0x(utils.hash(skA)).padStart(32,'0'));
 let pkB = utils.ensure0x(utils.strip0x(utils.hash(skB)).padStart(32,'0'));
 
-async function transferNFToken () {
+async function mintNFToken () {
     let A = await utils.rndHex(32);
     let S_A_A = await utils.rndHex(32);
     let S_A_G = await utils.rndHex(32);
@@ -162,14 +199,38 @@ async function transferNFToken () {
     console.log(pkA)
     console.log(Z_A_A)
 
-    //======= Proof ========//
+    //======= Proof - witnesses for mint!! ========//
+    // - publicInputHash = hash(asset, commitment)
+    // - asset - is the ERC-721 tokenId for the asset
+    // - publicKey (private) is the public key of Alice derived by hashing the secretKey of Alice
+    // - salt (private) is the salt for the commitment
+    // - commitment - is the public commitment
+    let commitment = utils.concatenateThenHash( // tokenId || public key || salt
+        utils.strip0x(A).slice(-32 * 2),
+        pkA,
+        S_A_A,
+    );
+
+    let publicInputHash = utils.concatenateThenHash(
+        A, commitment
+    );
+
     let elements = [
-        new ele.Element(Z_A_A, 'field', 248,1),
-        new ele.Element(A, 'field'),
-        new ele.Element(pkA, 'field'),
-        new ele.Element(S_A_G, 'field'),
+        new ele.Element(publicInputHash, 'field', 248,1),    //
+        new ele.Element(A, 'field'),        // asset - tokenId
+        new ele.Element(pkA, 'field'),      // public key
+        new ele.Element(S_A_A, 'field'),    // salt
+        new ele.Element(commitment, 'field'),   // commitment
+
     ];
-    console.log(cv.computeVectors(elements));
+    witness = cv.computeVectors(elements);
+    console.log(witness);
+    
+    let cmd = './zokrates compute-witness -a ';
+    witness.forEach( p => {
+        cmd += `${new BN(p,10).toString(10)} `
+    });
+    console.log(cmd);
 
     //======= Verify ========//
     let verifyElements = [
@@ -177,9 +238,97 @@ async function transferNFToken () {
     ];
     console.log('Verify : ', cv.computeVectors(verifyElements));
 
+
+    //=============================nft-transfer.code 관련 테스트===============================//
+
 }
 
-//transferNFToken()
+async function transferNFToken() {
+    let tokenId = await utils.rndHex(32);                                                     // tokenId
+    let B = await utils.rndHex(32);
+    let senderSecretKey = '0x0000000000111111111111111111111111111111111111111111111111111111';     // senderSecretKey
+    let skB = '0x0000000000222222222222222222222222222222222222222222222222222222';
+    
+    let receiverPublicKey = utils.ensure0x(utils.strip0x(utils.hash(skB)).padStart(32,'0'));          // receiverPublicKey
+    let pkA = utils.ensure0x(utils.strip0x(utils.hash(skA)).padStart(32,'0'));
+    console.log(pkB);
+
+    let originalCommitmentSalt = await utils.rndHex(32);                                                 // originalCommitmentSalt
+    let newCommitmentSalt = await utils.rndHex(32);                                                // newCommitmentSalt
+    let commitment = utils.concatenateThenHash(utils.strip0x(A).slice(-32 * 2), pkA, S_A_A); // commitment
+
+    let commitmentIndex;                                                                          // commitment Index
+
+    // [!!!!!!!!!] compute-vectors와 관련해서 contract 의 도움이 필요한 곳이 있으니 
+    //  일단 node <-> contract 연결을 테스트하고 transferNFToken 을 구동하라!!
+    let nfTokenShieldInstance;
+    let account;
+
+    //const root = await nfTokenShieldInstance.latestRoot();
+    const root = '0x1234';  // from the merkle tree in the contract
+    console.log(`Merkle Root : ${root}`);
+
+    // Calculate new arguments for the proof..
+    const nullifier = utils.concatenateThenHash(originalCommitmentSalt, senderSecretKey);
+    const outputCommitment = utils.concatenateThenHash(     // commitment = tokenId || publicKey || salt
+            utils.strip0x(tokenId).slice(-config.INPUT_HASHLENGTH * 2),
+            receiverPublicKey,
+            newCommitmentSalt,
+    );
+
+    // the Merkle Path from the token commitment to the root..
+    const path = await cv.computePath(account, nfTokenShieldInstance, commitment, commitmentIndex,)
+            .then(result =>{
+                return {
+                    elements: result.path.map(
+                        element => new Element(lelement, 'field', config.MERKLE_HASHLENGTH * 8, 1),
+                    ),
+                    position: new Element(result.positions, 'field', 128, 1),
+                };
+            });
+    
+    // check the path and root match
+    if (path.elements[0].hex != root) {
+        throw new Error (`Root inequality: sister-path[0]=${path.elements[0].hex} root=${root}`);
+    }
+
+    const p = config.ZOKRATES_PACKING_SIZE;                                                         // packing size in bits
+    const pt = Math.ceil((config.INPUT_HASHLENGTH*8) / config.ZOKRATES_PACKING_SIZE)    //????????? // packets in bits..
+
+    const publicInputHash = utils.concatenateThenHash(root, nullifier, outputCommitment);
+    console.log('publicInputHash: ', publicInputHash);  // zkp circuit 에 public input 들에 대한 전체 해쉬값!!! - To check integrity??!!
+    let elements =[
+        new ele.Element(publicInputHash, 'field', 248, 1),
+        new ele.Element(tokenId, 'field'),
+        ...path.elements.slice(1),
+        path,positions, // why these two not to be wrapped with Element.
+        new ele.Element(nullifier, 'field'),
+        new ele.Element(receiverPublicKey, 'field'),
+        new ele.Element(originalCommitmentSalt, 'field'),
+        new ele.Element(newCommitmentSalt, 'field'),
+        new ele.Element(senderSecretKey, 'field'),
+        new ele.Element(root, 'field'),
+        new ele.Element(outputCommitment, 'field'),
+    ];
+
+    witness = cv.computeVectors(elements);
+    console.log(witness);
+
+    let cmd = './zokrates compute-witness -a ';
+    witness.forEach( p => {
+        cmd += `${new BN(p,10).toString(10)} `
+    });
+    console.log(cmd);
+    
+    //=============== Verify ==============//
+    let verifyElements = [
+        new ele.Element(publicInputHash, 'field', 248,1),
+    ];
+    console.log('Verify : ', cv.computeVectors(verifyElements));
+    
+}
+
+mintNFToken()
 
 const pp = require('./precise-proof')
 const report = {

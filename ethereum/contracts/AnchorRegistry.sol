@@ -25,10 +25,9 @@ contract AnchorRegistry is ERC165 {
    * @return identifier bytes32 The document anchor identifier as found
    * @return merkleRoot bytes32 The document's root hash value
    */
-  function getAnchorById (string _identifier) 
+  function getAnchorById (string calldata _identifier) 
   external view 
   returns (
-    bytes32 identifier, 
-    bytes32 merkleRoot
+    string memory identifier, bytes32 merkleRoot
     );    
 }

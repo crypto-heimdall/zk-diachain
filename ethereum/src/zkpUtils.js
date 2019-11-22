@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const base = require('./baseUtils');
+const config = require('./config.js');
 
 const inputsHashLength = 32;
 
@@ -79,6 +80,14 @@ function hexToFieldPreserve(hexStr, packingSize, packets, silenceWarnings) {
     return decArr;
 }
 
+function getLeafIndexFromZCount(zCount) {
+    const zCountInt = parseInt(zCount, 10);
+    const merkleWidth = parseInt(2 ** (config.MERKLE_DEPTH - 1), 10);
+    const leafIndex = parseInt(merkleWidth - 1 + zCount, 10);
+
+    return leafIndex;
+}
+
 module.exports = {
     ensure0x,
     strip0x,
@@ -87,4 +96,5 @@ module.exports = {
     concatenateThenHash,
     hexToFieldPreserve,
     isHex,
+    getLeafIndexFromZCount,
 };

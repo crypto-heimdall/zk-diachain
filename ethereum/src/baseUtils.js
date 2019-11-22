@@ -171,11 +171,17 @@ function splitHexToBits(hexStr, n) {
 function binToDec(binStr) {
     const dec = convertBase(binStr, 2, 10);
     return dec;
-  }
+}
+
+function binToHex(binStr) {
+  const hex = convertBase(binStr, 2, 16);
+  return hex ? `0x${hex}` : null;
+}
 
 module.exports={
     splitHexToBits,
     binToDec,
     hexToBin,
     hexToBytes,
+    binToHex,
 };
