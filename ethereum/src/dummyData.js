@@ -5,7 +5,7 @@ const config = require('./config');
 const utils = require('./zkpUtils');
 
 const ADDR_MARKET = '0x473839c2aC0FD78A8740b1f3c03be6cc7529c1b8';
-const ADDR_DIANFT_MERKLE = '0x50E7d90bF2e0eEE896d4825B0D3863D240fa51d8';
+const ADDR_DIANFT_MERKLE = '0xf283A7CDb994a20d6733D9f9455d0126764D0ca1';
 const ACCOUNT = '0xc0bdc5a3c498f3ef252b2afb00707b9985a83eed';
 
 
@@ -23,9 +23,13 @@ async function dummyDiaNFT_Mint_noZkp() {
                 ACCOUNT, salt,);
 
     console.log (`DiaNFT Mint - TokenId : ${tokenId} , salt : ${salt} , commitment : ${commitment}`);
-    await diaNftInstance.mint(tokenId, commitment, {
+   const txReceipt =  await diaNftInstance.mint(tokenId, commitment, {
         from : ACCOUNT,    gas: 6500000, gasPrice: config.GASPRICE,
     });
+
+    //console.log(txReceipt.logs[0].args);
+    const commitmentIndex = txReceipt.logs[0].args.commitment_index;
+    console.log('commitment index : ', commitmentIndex);
 
     let root = await diaNftInstance.latestRoot();
     let count = await diaNftInstance.leafCount();

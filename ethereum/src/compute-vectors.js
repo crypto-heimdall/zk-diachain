@@ -16,7 +16,7 @@ async function computePath(account, shieldContract, _commitment, commitmentIndex
     // get the relevant token data from the contract..
         // Contract(DiaNFT_Merkle).merkleTree.call(index,{from:account});
     let leaf = await shieldContract.merkleTree.call(leafIndex, {from: account});
-    console.log(leaf);
+    console.log(`leafIndex : ${leafIndex} from commitmentIndex ${commitmentIndex} , leaf : ${leaf}`);
 
     if (commitMerkle === utils.strip0x(leaf)) {
         console.log('Found the matched one...');
@@ -32,6 +32,7 @@ async function computePath(account, shieldContract, _commitment, commitmentIndex
     let sisterSide = '';
 
     for ( let r = config.MERKLE_DEPTH - 1 ; r > 0 ; r -= 1) { // bottom-top 
+        console.log(r, s0, p0, t0);
         if (p0 % 2 === 0) { // p even
             s0 = p0 - 1;
             t0 = Math.floor((p0-1)/2);
@@ -68,16 +69,23 @@ async function computePath(account, shieldContract, _commitment, commitmentIndex
             nodeHashOld : utils.strip0x(el.nodeHashOld),
         };
     });
+
+    console.log(s);
+
     s = await Promise.all(s);
+
+    console.log('here...');
 
     // Check the lengths of the hashes of the path and the sister-path..
     // Merkle Hash length : 27 .. Hash length : 32
     if (s[0].nodeHashOld.length !== config.INPUT_HASHLENGTH * 2) {
+        console.log('..Oops..1..');
         throw new Error (`path nodeHash has incorrect length : ${s[0].nodeHashOld}`);
     }
     // the rest of the nodes..
-    for (let i = 1; i < s.length; i + 1) {
+    for (let i = 1; i < s.length; i += 1) {
         if (s[i].nodeHashOld.length != config.MERKLE_HASHLENGTH *2) {
+            console.log('..Oops..2');
             throw new Error (`sister path nodeHash has incorrect length : ${s[i].nodeHashOld}`);
         }
     }

@@ -3,7 +3,7 @@ const ZOKRATES_PACKING_SIZE = '128';
 const GASPRICE = 20000000000;
 const MERKLE_HASHLENGTH = 27;
 
-const MERKLE_DEPTH = 33;
+const MERKLE_DEPTH = 5;
 
 module.exports = {
     INPUT_HASHLENGTH,

@@ -245,26 +245,28 @@ async function mintNFToken () {
 
 }
 
-async function transferNFToken() {
-    let tokenId = await utils.rndHex(32);                                                     // tokenId
-    let B = await utils.rndHex(32);
-    let senderSecretKey = '0x0000000000111111111111111111111111111111111111111111111111111111';     // senderSecretKey
-    let skB = '0x0000000000222222222222222222222222222222222222222222222222222222';
+async function transferNFToken(tokenId, senderSecretKey, senderpublicKey, 
+                                originalCommitmentSalt, commitmentIndex,
+                                receiverPublicKey, newCommitmentSalt,
+                                nfTokenShieldInstance, account) {
+    //let tokenId = await utils.rndHex(32);                                                     // tokenId
+    //let B = await utils.rndHex(32);
+    //let senderSecretKey = '0x0000000000111111111111111111111111111111111111111111111111111111';     // senderSecretKey
+    //let skB = '0x0000000000222222222222222222222222222222222222222222222222222222';
     
-    let receiverPublicKey = utils.ensure0x(utils.strip0x(utils.hash(skB)).padStart(32,'0'));          // receiverPublicKey
-    let pkA = utils.ensure0x(utils.strip0x(utils.hash(skA)).padStart(32,'0'));
-    console.log(pkB);
+    //let receiverPublicKey = utils.ensure0x(utils.strip0x(utils.hash(skB)).padStart(32,'0'));          // receiverPublicKey
+    //let pkA = utils.ensure0x(utils.strip0x(utils.hash(skA)).padStart(32,'0'));
+    //console.log(pkB);
 
-    let originalCommitmentSalt = await utils.rndHex(32);                                                 // originalCommitmentSalt
-    let newCommitmentSalt = await utils.rndHex(32);                                                // newCommitmentSalt
-    let commitment = utils.concatenateThenHash(utils.strip0x(A).slice(-32 * 2), pkA, S_A_A); // commitment
-
-    let commitmentIndex;                                                                          // commitment Index
+    //let originalCommitmentSalt = await utils.rndHex(32);                                                 // originalCommitmentSalt
+    //let newCommitmentSalt = await utils.rndHex(32);                                                // newCommitmentSalt
+    let commitment = utils.concatenateThenHash(utils.strip0x(tokenId).slice(-32 * 2), 
+                senderpublicKey, originalCommitmentSalt); // commitment
 
     // [!!!!!!!!!] compute-vectors와 관련해서 contract 의 도움이 필요한 곳이 있으니 
     //  일단 node <-> contract 연결을 테스트하고 transferNFToken 을 구동하라!!
-    let nfTokenShieldInstance;
-    let account;
+    //let nfTokenShieldInstance;
+    //let account;
 
     //const root = await nfTokenShieldInstance.latestRoot();
     // const root = '0x1234';  // from the merkle tree in the contract
@@ -284,9 +286,9 @@ async function transferNFToken() {
             .then(result =>{
                 return {
                     elements: result.path.map(
-                        element => new Element(lelement, 'field', config.MERKLE_HASHLENGTH * 8, 1),
+                        element => new ele.Element(element, 'field', config.MERKLE_HASHLENGTH * 8, 1),
                     ),
-                    position: new Element(result.positions, 'field', 128, 1),
+                    positions: new ele.Element(result.positions, 'field', 128, 1),
                 };
             });
     
@@ -304,7 +306,7 @@ async function transferNFToken() {
         new ele.Element(publicInputHash, 'field', 248, 1),
         new ele.Element(tokenId, 'field'),
         ...path.elements.slice(1),
-        path,positions, // why these two not to be wrapped with Element.
+        path.positions, // why these two not to be wrapped with Element.
         new ele.Element(nullifier, 'field'),
         new ele.Element(receiverPublicKey, 'field'),
         new ele.Element(originalCommitmentSalt, 'field'),
@@ -331,7 +333,8 @@ async function transferNFToken() {
     
 }
 
-mintNFToken()
+
+
 
 /*
 const makeRequest = async() => {
@@ -362,7 +365,7 @@ async function testConnectContract() {
     return;
 }
 
-testConnectContract();
+
 
 
 const pp = require('./precise-proof')
@@ -428,5 +431,37 @@ function testPreciseProof(){
         
 }
 
-testPreciseProof()
+//
 
+/*
+function transferNFToken(tokenId, senderSecretKey, senderpublicKey, 
+    originalCommitmentSalt, commitmentIndex,
+    receiverPublicKey, newCommitmentSalt,
+    nfTokenShieldInstance, account)
+*/
+async function testTransfer() {
+    const nfTokenShield = contract(jsonfile.readFileSync('../build/contracts/DiaNFT_Merkle.json'));
+    let web3_connection = Web3.connect();
+
+    nfTokenShield.setProvider(web3_connection);
+    const nfTokenShieldInstance = await nfTokenShield.at('0x379c0DE3313Abb0b5e608F882dB91d4dFc552D79');
+
+    for (let i = 0; i < 30 ; i+=1){
+        
+    }
+
+    await transferNFToken('0xd2450fb880ff3b5daa7a9ec4b1a5f2cd87a52e713e6b8e3f7461d9b3c390c768', 
+                    skA, 
+                    '0xc0bdc5a3c498f3ef252b2afb00707b9985a83eed', 
+                    '0xc0b4919a0286f457adb39bd69def0f38978ad578636064a053641e8e779212c5', 
+                    2, 
+                    '0x0b04beacd46a1813c0a895ab7e0a3a85bd0ace2b', 
+                    '0x745923299e40f2d80c14bbf13d5966f2bcd7f2aa35c7bc514f7d3699ca1d39af', 
+                    nfTokenShieldInstance, 
+                    '0xc0bdc5a3c498f3ef252b2afb00707b9985a83eed');
+}
+
+//mintNFToken()
+//testPreciseProof()
+//testConnectContract();
+testTransfer()

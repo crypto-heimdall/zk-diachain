@@ -30,6 +30,7 @@ depth row  width  st#     end#
   w = width = 2^(depth-1) = 2^3 = 16
   #nodes = (2^depth)-1 = 2^5-2 = 30
 */
+    event Mint(address from, address to, bytes32 token_id, bytes32 commitment, uint256 commitment_index);
 
     uint constant merkleWidth = 16; // 2^32
     uint constant merkleDepth = 5;
@@ -62,7 +63,7 @@ depth row  width  st#     end#
         roots[root] = root;
         latestRoot = root;
         
-        leafCount++;
+        emit Mint(msg.sender, address(this), _tokenId, _commitment, leafCount++);
     }
 
     function updatePathToRoot(uint p) private returns (bytes32) {
