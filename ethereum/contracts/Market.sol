@@ -39,16 +39,22 @@ contract Market {
         return dias;
     }
 */
-    function getDiamonds () public view returns (string[] memory , string[] memory,string[] memory , string[] memory, uint[] memory ) {
+    function getDiamonds (uint from, uint end) public view returns
+            (string[] memory , string[] memory,string[] memory , string[] memory, uint[] memory ) {
         
-        string[] memory cuts = new string[](itemCount);
-        string[] memory colors = new string[](itemCount);
-        string[] memory clarity = new string[](itemCount);
-        string[] memory carat = new string[](itemCount);
-        uint[] memory price = new uint[](itemCount);
-        
+        if (from > itemCount)   from = itemCount;
+        if (end > itemCount)    end = itemCount + 1;
+
+        uint numItems = end - from;
+
+        string[] memory cuts = new string[](numItems);
+        string[] memory colors = new string[](numItems);
+        string[] memory clarity = new string[](numItems);
+        string[] memory carat = new string[](numItems);
+        uint[] memory price = new uint[](numItems);
+
         //OpenData[] memory dias = new OpenData[](itemCount);
-        for (uint i = 0; i < itemCount; i++) {
+        for (uint i = from; i < end; i++) {
             OpenData storage dia = RegisteredDiaList[i];
             cuts[i] = dia.cut;
             colors[i] = dia.color;

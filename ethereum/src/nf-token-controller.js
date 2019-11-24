@@ -8,6 +8,8 @@ const cv = require('./compute-vectors')
 const BN = require('bn.js')
 const Web3 = require('./web3')
 
+const jsonfile = require('jsonfile')
+
 /**
  * Mint a commitment 
  * @param {Object} vkId - vkId for NFT's MintToken ..(Low Priority)
@@ -330,15 +332,36 @@ async function transferNFToken() {
 
 mintNFToken()
 
-async function testConnectContract() {
-    const nfTokenShield = contract('./build/contracts/DiaNFT_Merkle.json');
+/*
+const makeRequest = async() => {
+    const nfTokenShield = contract(jsonfile.readFileSync('../build/contracts/DiaNFT_Merkle.json'));
     nfTokenShield.setProvider(Web3.connect());
-    const nfTokenShieldInstance = await nfTokenShield.at('0x854aAC232B05c2BE1B29f65216fd4444Dab72b43');
+    const nfTokenShieldInstance = await nfTokenShield.at('0xf3A62d9b65ACD40CCa27c9712Ec68144e01Bed59');
+    let leafCount = await nfTokenShieldInstance.leafCount.call()
+    console.log(leafCount);
 
-    console.log(nfTokenShieldInstance);
+    console.log('adf'); 
 }
 
-testConnectContract()
+makeRequest();
+*/
+
+async function testConnectContract() {
+    const nfTokenShield = contract(jsonfile.readFileSync('../build/contracts/DiaNFT_Merkle.json'));
+    let web3_connection = Web3.connect();
+
+    nfTokenShield.setProvider(web3_connection);
+    const nfTokenShieldInstance = await nfTokenShield.at('0xf3A62d9b65ACD40CCa27c9712Ec68144e01Bed59');
+    let leafCount = await nfTokenShieldInstance.leafCount.call()
+    console.log(leafCount);
+    //console.log(Web3.isConnect());
+    
+    web3_connection.connection.close(); // Done!
+
+    return;
+}
+
+testConnectContract();
 
 
 const pp = require('./precise-proof')

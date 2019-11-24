@@ -2,7 +2,12 @@ const Web3 = require('web3');
 
 function  connection() {
         return this.web3;
-    }
+}
+
+function disconnect() {
+    if (this.web3)
+        this.web.currentProvider.connection.close();
+}
 
 function    connect() {
         if (this.web3) return this.web3.currentProvider;
@@ -29,4 +34,5 @@ module.exports={
     connection,
     connect,
     isConnect,
+    disconnect,
 };
