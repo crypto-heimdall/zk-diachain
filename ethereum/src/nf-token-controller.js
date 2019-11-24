@@ -267,7 +267,8 @@ async function transferNFToken() {
     let account;
 
     //const root = await nfTokenShieldInstance.latestRoot();
-    const root = '0x1234';  // from the merkle tree in the contract
+    // const root = '0x1234';  // from the merkle tree in the contract
+    const root = await nfTokenShieldInstance.latestRoot();
     console.log(`Merkle Root : ${root}`);
 
     // Calculate new arguments for the proof..

@@ -1,10 +1,38 @@
 const contract = require('truffle-contract');
 const Web3 = require('./web3');
 const jsonfile = require('jsonfile');
-const config = require('./config')
+const config = require('./config');
+const utils = require('./zkpUtils');
 
 const ADDR_MARKET = '0x473839c2aC0FD78A8740b1f3c03be6cc7529c1b8';
+const ADDR_DIANFT_MERKLE = '0x50E7d90bF2e0eEE896d4825B0D3863D240fa51d8';
 const ACCOUNT = '0xc0bdc5a3c498f3ef252b2afb00707b9985a83eed';
+
+
+async function dummyDiaNFT_Mint_noZkp() {
+    const diaNft = contract(jsonfile.readFileSync('../build/contracts/DiaNFT_Merkle.json'));
+    let web3_connection = Web3.connect();
+    diaNft.setProvider(web3_connection);
+    const diaNftInstance = await diaNft.at(ADDR_DIANFT_MERKLE);
+
+    //mint (bytes32 tokenId , bytes32 commitment)
+    let tokenId = await utils.rndHex(32);
+    let salt = await utils.rndHex(32);
+
+    let commitment = utils.concatenateThenHash(utils.strip0x(tokenId).slice(-config.INPUT_HASHLENGTH * 2),
+                ACCOUNT, salt,);
+
+    console.log (`DiaNFT Mint - TokenId : ${tokenId} , salt : ${salt} , commitment : ${commitment}`);
+    await diaNftInstance.mint(tokenId, commitment, {
+        from : ACCOUNT,    gas: 6500000, gasPrice: config.GASPRICE,
+    });
+
+    let root = await diaNftInstance.latestRoot();
+    let count = await diaNftInstance.leafCount();
+
+    console.log('LatestRoot : ', root);
+    console.log('Leaf Count : ', count);
+}
 
 async function dummyForMarket() {
     const market = contract(jsonfile.readFileSync('../build/contracts/Market.json'));
@@ -30,4 +58,5 @@ async function dummyForMarket() {
     
 }
 
-dummyForMarket();
+dummyDiaNFT_Mint_noZkp();
+//dummyForMarket();

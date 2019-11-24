@@ -15,7 +15,9 @@ async function computePath(account, shieldContract, _commitment, commitmentIndex
 
     // get the relevant token data from the contract..
         // Contract(DiaNFT_Merkle).merkleTree.call(index,{from:account});
-    let leaf = "0x1234";   // some hash value!!
+    let leaf = await shieldContract.merkleTree.call(leafIndex, {from: account});
+    console.log(leaf);
+
     if (commitMerkle === utils.strip0x(leaf)) {
         console.log('Found the matched one...');
     } else {
@@ -40,7 +42,8 @@ async function computePath(account, shieldContract, _commitment, commitmentIndex
             sisterSide = '1';   // the sister will be on the right..
         }
         // Temp .. nodeHash is fetched from the contract with index s0
-        nodeHash = '0x1234';
+        //nodeHash = '0x1234';
+        nodeHash = await shieldContract.merkleTree.call(s0, {from:account});
         s[r] = {
             merkleIndex : s0,
             nodeHashOld : nodeHash,
@@ -50,7 +53,8 @@ async function computePath(account, shieldContract, _commitment, commitmentIndex
     }
 
     // Temp - this nodeHash will be from 'getLatestRoot' from the contract
-    nodeHash = '0x5678';
+    // nodeHash = '0x5678';
+    nodeHash = await shieldContract.latestRoot();
     s[0] = {
         merkleIndex : 0,
         nodeHashOld : nodeHash,

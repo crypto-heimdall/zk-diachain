@@ -12,4 +12,5 @@ module.exports = {
     MERKLE_HASHLENGTH,
 
     MERKLE_DEPTH,
+
 };
