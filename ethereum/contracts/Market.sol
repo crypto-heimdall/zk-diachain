@@ -96,6 +96,16 @@ contract Market {
         return false;
     }
 
+    function returnDiamond(uint itemId) public returns (bool) {
+        MockFundPool fp = MockFundPool(addrFundPool);
+        if (fp.refundDeposit(itemId)) {
+            return true;
+        }
+        return false;
+    }
+
+
+
 /*
     function stateTransition(   bytes32 targetHashedDia, DiaStatus toStatus,
                                 bytes32 _anchor, // Merkle Root of NFT Tree..
