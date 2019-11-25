@@ -1,9 +1,14 @@
 pragma solidity >= 0.4.25 < 0.6.0;
 pragma experimental ABIEncoderV2;
 
+import './MockFundPool.sol';
+
 contract Market {
 
-    enum DiaStatus {OnSale, OffSale, Rented}
+    event Register(uint itemId, string cut, string color, string clarity, string carat, uint32 price);
+    event Deposit(uint itemId, uint32 price, bool success);
+
+    enum DiaStatus {OffSale, OnSale, Rented, Sold}
 
     struct OpenData {
 
@@ -18,16 +23,20 @@ contract Market {
         DiaStatus status;
     }
     uint private itemCount;
-
     mapping (uint => OpenData) RegisteredDiaList;
 
-    constructor () public {
+    // linking with other contracts
+    address public addrFundPool;
+
+    constructor (address fundPool) public {
+        addrFundPool = fundPool;
         itemCount = 0;
     }
 
     function register(string memory cut, string memory color, string memory clarity, string memory carat, uint32 price) public {
         RegisteredDiaList[itemCount] = OpenData(itemCount, cut, color, clarity, carat, price, DiaStatus.OffSale);
-        itemCount++;
+
+        emit Register(itemCount++, cut, color, clarity, carat, price);
     }
 /*
     function getDiamonds () public view returns (OpenData[] memory) {
@@ -40,7 +49,7 @@ contract Market {
     }
 */
     function getDiamonds (uint from, uint end) public view returns
-            (string[] memory , string[] memory,string[] memory , string[] memory, uint[] memory ) {
+            (string[] memory , string[] memory,string[] memory , string[] memory, uint[] memory, DiaStatus[] memory ) {
         
         if (from > itemCount)   from = itemCount;
         if (end > itemCount)    end = itemCount + 1;
@@ -52,6 +61,7 @@ contract Market {
         string[] memory clarity = new string[](numItems);
         string[] memory carat = new string[](numItems);
         uint[] memory price = new uint[](numItems);
+        DiaStatus[] memory status = new DiaStatus[](numItems);
 
         //OpenData[] memory dias = new OpenData[](itemCount);
         for (uint i = from; i < end; i++) {
@@ -62,13 +72,28 @@ contract Market {
             carat[i] = dia.carat;
             
             price[i] = dia.price;
-            
+            status[i] = dia.status;
         }
-        return (cuts, colors, clarity, carat, price);
+        return (cuts, colors, clarity, carat, price, status);
     }
 
-    function transitState (uint itemId, DiaStatus newStatus) public {
+    function transitStatus (uint itemId, DiaStatus newStatus) public {
         RegisteredDiaList[itemId].status = newStatus;
+    }
+
+    function changeDiamondStatus(uint itemId) public returns (bool) {
+        require(RegisteredDiaList[itemId].status == DiaStatus.OnSale, "The item is not onsale..");
+        
+        // Request deposit to FundPool
+        MockFundPool fp = MockFundPool(addrFundPool);
+        if (fp.requestDeposit(itemId, RegisteredDiaList[itemId].price)) {
+            // event Deposit(uint itemId, uint32 price, bool success);
+            emit Deposit(itemId, RegisteredDiaList[itemId].price, true);
+            RegisteredDiaList[itemId].status == DiaStatus.Rented;
+            return true;
+        }
+        emit Deposit(itemId, RegisteredDiaList[itemId].price, false);
+        return false;
     }
 
 /*
