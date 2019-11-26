@@ -178,10 +178,18 @@ function binToHex(binStr) {
   return hex ? `0x${hex}` : null;
 }
 
+function hexToDec(hexStr) {
+  if(hexStr.substring(0,2) === '0x') {
+    return convertBase(hexStr.substring(2).toLowerCase(), 16, 10);
+  }
+  return convertBase(hexStr.toLowerCase(), 16,10);
+}
+
 module.exports={
     splitHexToBits,
     binToDec,
     hexToBin,
     hexToBytes,
     binToHex,
+    hexToDec,
 };
