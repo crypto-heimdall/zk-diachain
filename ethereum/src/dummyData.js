@@ -5,8 +5,8 @@ const config = require('./config');
 const utils = require('./zkpUtils');
 
 const ADDR_MARKET = '0x473839c2aC0FD78A8740b1f3c03be6cc7529c1b8';
-const ADDR_DIANFT_MERKLE = '0xf283A7CDb994a20d6733D9f9455d0126764D0ca1';
-const ACCOUNT = '0xc0bdc5a3c498f3ef252b2afb00707b9985a83eed';
+const ADDR_DIANFT_MERKLE = '0x7439214762d087E3aF846bfCF9e5C4239a8842d8';
+const ACCOUNT = '0xaea19bed7dd9717a78ee24bac271eca5cb149f3a';
 
 
 async function dummyDiaNFT_Mint_noZkp() {

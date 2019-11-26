@@ -273,13 +273,15 @@ async function transferNFToken(tokenId, senderSecretKey, senderpublicKey,
     const root = await nfTokenShieldInstance.latestRoot();
     console.log(`Merkle Root : ${root}`);
 
-    // Calculate new arguments for the proof..
-    const nullifier = utils.concatenateThenHash(originalCommitmentSalt, senderSecretKey);
+    // Calculate new arguments for the proof.. - cryptonian.base : replace secret with publicKey
+    //const nullifier = utils.concatenateThenHash(originalCommitmentSalt, senderSecretKey);
+    const nullifier = utils.concatenateThenHash(originalCommitmentSalt, senderpublicKey);
     const outputCommitment = utils.concatenateThenHash(     // commitment = tokenId || publicKey || salt
             utils.strip0x(tokenId).slice(-config.INPUT_HASHLENGTH * 2),
             receiverPublicKey,
             newCommitmentSalt,
     );
+
 
     // the Merkle Path from the token commitment to the root..
     const path = await cv.computePath(account, nfTokenShieldInstance, commitment, commitmentIndex,)
@@ -311,7 +313,7 @@ async function transferNFToken(tokenId, senderSecretKey, senderpublicKey,
         new ele.Element(receiverPublicKey, 'field'),
         new ele.Element(originalCommitmentSalt, 'field'),
         new ele.Element(newCommitmentSalt, 'field'),
-        new ele.Element(senderSecretKey, 'field'),
+        new ele.Element(senderpublicKey, 'field'), // cryptonian.base - originally senderSecretKey
         new ele.Element(root, 'field'),
         new ele.Element(outputCommitment, 'field'),
     ];
@@ -444,21 +446,17 @@ async function testTransfer() {
     let web3_connection = Web3.connect();
 
     nfTokenShield.setProvider(web3_connection);
-    const nfTokenShieldInstance = await nfTokenShield.at('0x379c0DE3313Abb0b5e608F882dB91d4dFc552D79');
+    const nfTokenShieldInstance = await nfTokenShield.at('0x7439214762d087E3aF846bfCF9e5C4239a8842d8');
 
-    for (let i = 0; i < 30 ; i+=1){
-        
-    }
-
-    await transferNFToken('0xd2450fb880ff3b5daa7a9ec4b1a5f2cd87a52e713e6b8e3f7461d9b3c390c768', 
-                    skA, 
-                    '0xc0bdc5a3c498f3ef252b2afb00707b9985a83eed', 
-                    '0xc0b4919a0286f457adb39bd69def0f38978ad578636064a053641e8e779212c5', 
-                    2, 
-                    '0x0b04beacd46a1813c0a895ab7e0a3a85bd0ace2b', 
-                    '0x745923299e40f2d80c14bbf13d5966f2bcd7f2aa35c7bc514f7d3699ca1d39af', 
-                    nfTokenShieldInstance, 
-                    '0xc0bdc5a3c498f3ef252b2afb00707b9985a83eed');
+    await transferNFToken('0x24b000741ba4d89afad4acd91f28c0d645834a85fd26dbb8b961563a0b98379a',     // tokenId
+                    skA,                                                                            // sender_SecretKey
+                    '0xaea19bed7dd9717a78ee24bac271eca5cb149f3a',                                   // sender_PublicKey
+                    '0x79625f756275da4c3a3f1cd32a03861fe58461335d5cf987810975f72d5520a3',           // original_Commitment_Salt
+                    1,                                                                              // commitment_Index
+                    '0x6778cf52a91ed0532d217eb041f385ae57a9d9d3',                                   // receiver_PublicKey
+                    '0x745923299e40f2d80c14bbf13d5966f2bcd7f2aa35c7bc514f7d3699ca1d39af',           // new_Commitment_Salt
+                    nfTokenShieldInstance,                                                          // ..
+                    '0xaea19bed7dd9717a78ee24bac271eca5cb149f3a');                                  // Account
 }
 
 //mintNFToken()

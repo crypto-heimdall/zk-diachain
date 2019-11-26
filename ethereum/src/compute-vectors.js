@@ -31,6 +31,12 @@ async function computePath(account, shieldContract, _commitment, commitmentIndex
     let t0 = 0;
     let sisterSide = '';
 
+
+    for (let index = 0; index < 31; index++) {
+        nodeHash = await shieldContract.merkleTree.call(index, {from:account});
+        console.log('Index : ', index, ' , Nodehash : ', nodeHash);
+    }
+
     for ( let r = config.MERKLE_DEPTH - 1 ; r > 0 ; r -= 1) { // bottom-top 
         console.log(r, s0, p0, t0);
         if (p0 % 2 === 0) { // p even
@@ -45,6 +51,7 @@ async function computePath(account, shieldContract, _commitment, commitmentIndex
         // Temp .. nodeHash is fetched from the contract with index s0
         //nodeHash = '0x1234';
         nodeHash = await shieldContract.merkleTree.call(s0, {from:account});
+        console.log('s0 : ', s0, ' , Nodehash : ', nodeHash);
         s[r] = {
             merkleIndex : s0,
             nodeHashOld : nodeHash,

@@ -106,14 +106,11 @@ def main(field publicInputHash, private field assetHigh, private field assetLow,
 	// H(asset|publicKeyA|saltA) = commitmentA is in the Merkle Tree
 
 	// Calculation of publicKeyA from H(secretKeyA)
-	// field[256] publicKeyABits = sha256of512(secretKeyABits, padding256To512)	// cryptonian.base - secretKey replaced with publicKey for testing!!
-																				// remove connection btw secretKey and publicKey
+	field[256] publicKeyABits = sha256of512(secretKeyABits, padding256To512)
 
 
 	// And calculation of the commitment
-	//field[768] preimage768 = concatenate256x256x256(assetBits, publicKeyABits, saltABits)
-	field[768] preimage768 = concatenate256x256x256(assetBits, secretKeyABits, saltABits) // cryptonian.base - secretKey replaced with publicKey for testing!!
-
+	field[768] preimage768 = concatenate256x256x256(assetBits, publicKeyABits, saltABits)
 
 	field[256] hash = sha256of1024(preimage768[0..256], preimage768[256..512], preimage768[512..768], padding768To1024) // commitmentA
 
@@ -135,11 +132,11 @@ def main(field publicInputHash, private field assetHigh, private field assetLow,
 
 	//check proofs
 
-	//- nullifierBits == nullifierBitsCheck
+	nullifierBits == nullifierBitsCheck
 
-	//- rootBits == rootBitsCheck
+	rootBits == rootBitsCheck
 
-	//- commitmentBBits == commitmentBBitsCheck
+	commitmentBBits == commitmentBBitsCheck
 
 
 	// Check that the 'public inputs' hash to the publicInputHash:
@@ -148,7 +145,7 @@ def main(field publicInputHash, private field assetHigh, private field assetLow,
 
 	field[256] publicInputHashBitsCheck = sha256of1024(preimage768[0..256], preimage768[256..512], preimage768[512..768], padding768To1024)
 
-	//- publicInputHashBits[8..256] == publicInputHashBitsCheck[8..256]
+	publicInputHashBits[8..256] == publicInputHashBitsCheck[8..256]
 
 
 	return
