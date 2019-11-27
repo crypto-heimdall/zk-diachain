@@ -1,0 +1,15 @@
+# Compiled binary addons (http://nodejs.org/api/addons.html)
+ethereum/build
+
+# node
+ethereum/node_modules/
+
+#zkp
+zkp/circuit/out
+zkp/circuit/out.ztf
+zkp/circuit/witness
+zkp/circuit/proving.key
+zkp/circuit/verification.key
+
+
+

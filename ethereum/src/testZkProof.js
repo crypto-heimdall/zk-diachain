@@ -22,6 +22,7 @@ function loadProof() {
     proof = utils.flattenDeep(proof);
     // convert to decimal, as the solidity functions expect uints
     proof = proof.map(el => base.hexToDec(el));
+    console.log(typeof proof[0])
     console.log(proof);
 
 }

@@ -23,7 +23,8 @@ but, salt would be one-time if revealed to mint DiaNFT related to this report.
 
 contract ReportRegistry_pp is AnchorRegistry {
     struct Commitment {
-        bytes32 merkleRoot; 
+        //bytes32 merkleRoot; 
+        bytes32 documentRoot;
         string schema;
     }
 
@@ -38,13 +39,15 @@ contract ReportRegistry_pp is AnchorRegistry {
     }
 
     function getCommitment(string memory girdleCode) public returns (Commitment memory) {
-        require(commitments[girdleCode].merkleRoot != bytes32(0x0),"the given girdlecode NOT FOUND..");
+        //require(commitments[girdleCode].merkleRoot != bytes32(0x0),"the given girdlecode NOT FOUND..");
+        require(commitments[girdleCode].documentRoot != bytes32(0x0),"the given girdlecode NOT FOUND..");
         return commitments[girdleCode];
     }
 
-    function register(string memory girdleCode, bytes32 merkleRoot, string memory schema) public returns (bool) {
-        require(commitments[girdleCode].merkleRoot == bytes32(0x0), "the girdle code ALREADY Registered..");
-        commitments[girdleCode] = Commitment(merkleRoot, schema);
+    // documentRoot = Hash ( merkle root of precise proof || wholesaler's public key )
+    function register(string memory girdleCode, bytes32 documentRoot, string memory schema) public returns (bool) {
+        require(commitments[girdleCode].documentRoot == bytes32(0x0), "the girdle code ALREADY Registered..");
+        commitments[girdleCode] = Commitment(documentRoot, schema);
         girdleCodesLUT.push(girdleCode);
 
         emit NewCommitment(msg.sender, girdleCode);
@@ -53,7 +56,7 @@ contract ReportRegistry_pp is AnchorRegistry {
     // Data location must be "calldata" for parameter in external function, but "memory" was given.
     // !! Must be Checked : calldata vs memory indicator
     function getAnchorById(string calldata _identifier) external view returns (string memory, bytes32) {
-        return (_identifier, commitments[_identifier].merkleRoot);
+        return (_identifier, commitments[_identifier].documentRoot);
     }
 /*  Is it needed??
     function setAnchorById (string calldata _anchorId, bytes32 documentRoot) external payable {
