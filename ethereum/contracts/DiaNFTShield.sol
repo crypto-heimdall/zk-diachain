@@ -93,4 +93,6 @@ contract DiaNFTShield {
 
     }
 
+    // function transfer(uint256[] calldata _proof, uint256[] calldata _inputs, bytes32 _vkId, bytes32 _root, bytes32 _nullifier, bytes32 _commitment)
+
 }

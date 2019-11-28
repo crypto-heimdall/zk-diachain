@@ -31,6 +31,7 @@ depth row  width  st#     end#
   #nodes = (2^depth)-1 = 2^5-2 = 30
 */
     event Mint(address from, address to, bytes32 token_id, bytes32 commitment, uint256 commitment_index);
+    event Transfer(bytes32 token_id, bytes32 commitment);
 
     uint constant merkleWidth = 16; // 2^32
     uint constant merkleDepth = 5;
@@ -64,6 +65,12 @@ depth row  width  st#     end#
         latestRoot = root;
         
         emit Mint(msg.sender, address(this), _tokenId, _commitment, leafCount++);
+    }
+
+    function transfer(bytes32 _tokenId, bytes32 _commitment) external {
+        
+        emit Transfer(_tokenId, _commitment);
+
     }
 
     function updatePathToRoot(uint p) private returns (bytes32) {

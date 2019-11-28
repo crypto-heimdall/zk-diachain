@@ -5,9 +5,27 @@ const config = require('./config');
 const utils = require('./zkpUtils');
 
 const ADDR_MARKET = '0x473839c2aC0FD78A8740b1f3c03be6cc7529c1b8';
-const ADDR_DIANFT_MERKLE = '0x7439214762d087E3aF846bfCF9e5C4239a8842d8';
+const ADDR_DIANFT_MERKLE = '0x19c43C361AcE6BE4fa4Ed7517aD341ff32c8C00D';
 const ACCOUNT = '0xaea19bed7dd9717a78ee24bac271eca5cb149f3a';
 
+async function dummyDiaNFT_Transfer_noZkp() {
+    const diaNft = contract(jsonfile.readFileSync('../build/contracts/DiaNFT_Merkle.json'));
+    let web3_connection = Web3.connect();
+    diaNft.setProvider(web3_connection);
+    const diaNftInstance = await diaNft.at(ADDR_DIANFT_MERKLE);
+
+    //mint (bytes32 tokenId , bytes32 commitment)
+    let tokenId = await utils.rndHex(32);
+    let salt = await utils.rndHex(32);
+
+    let commitment = utils.concatenateThenHash(utils.strip0x(tokenId).slice(-config.INPUT_HASHLENGTH * 2),
+                ACCOUNT, salt,);
+
+    console.log (`DiaNFT Mint - TokenId : ${tokenId} , salt : ${salt} , commitment : ${commitment}`);
+   const txReceipt =  await diaNftInstance.transfer(tokenId, commitment, {
+        from : ACCOUNT,    gas: 6500000, gasPrice: config.GASPRICE,
+    });
+}
 
 async function dummyDiaNFT_Mint_noZkp() {
     const diaNft = contract(jsonfile.readFileSync('../build/contracts/DiaNFT_Merkle.json'));

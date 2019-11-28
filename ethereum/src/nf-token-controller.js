@@ -138,6 +138,52 @@ async function mintDia( tokenId, ownerPublicKey, salt, blockchainOptions) {
 
 }
 
+async function generateCmdforMint( tokenId, ownerPublicKey, salt) {
+
+    const p = config.ZOKRATES_PACKING_SIZE; // ????
+    const pt = Math.ceil((config.INPUTS_HASHLENGTH * 8 ) / config.ZOKRATES_PACKING_SIZE);   // ????
+
+    const commitment = utils.concatenateThenHash(
+        utils.strip0x(tokenId).slice(-32*2),
+        ownerPublicKey,
+        salt,
+    );
+    console.log('z_A commitment:', commitment, ' : ', utils.hexToFieldPreserve(commitment, p, pt));
+
+    const publicInputHash = utils.concatenateThenHash(tokenId, commitment);
+
+    console.log('Computing proof with w=[pk_A, S_A] x=[A,z_A,1]');
+    
+    let proof;
+    let witnesses = [
+        new ele.Element(publicInputHash, 'field', 248, 1),
+        new ele.Element(tokenId, 'field'),
+        new ele.Element(ownerPublicKey, 'field'),
+        new ele.Element(salt, 'field'),
+        new ele.Element(commitment, 'field'),
+    ];
+    // === proof will be generated from 'witnesses'
+
+    let inputs = [new ele.Element(publicInputHash, 'field', 248,1)];
+    
+//    console.log('witness : ', cv.computeVectors(witnesses), 
+//                    ', inputs : ',  cv.computeVectors(inputs));
+
+    witness = cv.computeVectors(witnesses);
+
+    let cmd = './zokrates compute-witness -a ';
+    witness.forEach( p => {
+        cmd += `${new BN(p,10).toString(10)} `
+    });
+    
+    let retValue = {};
+    retValue.cmd = cmd;
+    retValue.commitment = commitment;
+    retValue.inputs = cv.computeVectors(inputs);
+
+    return retValue;
+}
+
 
 async function transferDia(tokenID, receiverPublicKey, originalCommitmentSalt, newCommitmentSalt,
                         senderSecretKey, commitment, commitmentIndex,
@@ -240,12 +286,14 @@ async function mintNFToken () {
     ];
     console.log('Verify : ', cv.computeVectors(verifyElements));
 
-
+    console.log('CMD :' , await generateCmdforMint( A, pkA, S_A_A));
     //=============================nft-transfer.code 관련 테스트===============================//
 
 }
 
-async function transferNFToken(tokenId, senderSecretKey, senderpublicKey, 
+
+// transferNFToken --> generateCmdforTransfer
+async function generateCmdforTransfer(tokenId, senderSecretKey, senderpublicKey, 
                                 originalCommitmentSalt, commitmentIndex,
                                 receiverPublicKey, newCommitmentSalt,
                                 nfTokenShieldInstance, account) {
@@ -331,8 +379,16 @@ async function transferNFToken(tokenId, senderSecretKey, senderpublicKey,
     let verifyElements = [
         new ele.Element(publicInputHash, 'field', 248,1),
     ];
-    console.log('Verify : ', cv.computeVectors(verifyElements));
+    let inputs = cv.computeVectors(verifyElements);
     
+    let retValue = {};
+    retValue.cmd = cmd;
+    retValue.inputs = inputs;
+    retValue.commitment = outputCommitment;
+    retValue.root = root;
+    retValue.nullifier = nullifier;
+
+    return retValue;
 }
 
 
@@ -448,7 +504,8 @@ async function testTransfer() {
     nfTokenShield.setProvider(web3_connection);
     const nfTokenShieldInstance = await nfTokenShield.at('0x7439214762d087E3aF846bfCF9e5C4239a8842d8');
 
-    await transferNFToken('0x24b000741ba4d89afad4acd91f28c0d645834a85fd26dbb8b961563a0b98379a',     // tokenId
+    //await transferNFToken('0x24b000741ba4d89afad4acd91f28c0d645834a85fd26dbb8b961563a0b98379a',     // tokenId
+    await generateCmdforTransfer('0x24b000741ba4d89afad4acd91f28c0d645834a85fd26dbb8b961563a0b98379a',     // tokenId
                     skA,                                                                            // sender_SecretKey
                     '0xaea19bed7dd9717a78ee24bac271eca5cb149f3a',                                   // sender_PublicKey
                     '0x79625f756275da4c3a3f1cd32a03861fe58461335d5cf987810975f72d5520a3',           // original_Commitment_Salt
@@ -458,8 +515,16 @@ async function testTransfer() {
                     nfTokenShieldInstance,                                                          // ..
                     '0xaea19bed7dd9717a78ee24bac271eca5cb149f3a');                                  // Account
 }
-
 //mintNFToken()
 //testPreciseProof()
 //testConnectContract();
-testTransfer()
+//testTransfer()
+
+
+module.exports = {
+    generateCmdforMint,
+    generateCmdforTransfer,
+//    mintDia,
+//    mintNFToken,
+}
+
