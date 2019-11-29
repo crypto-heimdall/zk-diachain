@@ -3,7 +3,7 @@ pragma experimental ABIEncoderV2;
 
 import "./ReportRegistry_pp.sol";
 import "./Verifier_Mint.sol";
-import "./Verifier_Transfer.sol";
+//import "./Verifier_Transfer.sol";
 
 contract DiaShieldNFT_pp {
   /*
@@ -64,7 +64,7 @@ depth row  width  st#     end#
     address internal verifier_transfer_;
 
 //===== Event =======//
-    event Mint(bytes32 token_id, bytes32 commitment, uint256 commitment_index);
+    event Mint(address from, address to, bytes32 token_id, bytes32 commitment, uint256 commitment_index);
     event Transfer(bytes32 nullifier, bytes32 commitment, uint256 commitment_index);
     
     constructor(address _anchorRegistry, address _verifier_mint, address _verifier_transfer) public {
@@ -72,7 +72,7 @@ depth row  width  st#     end#
         anchorRegistry_ = _anchorRegistry;
 
         // set up verifier for zkp
-        verifier_mint_ = _verify_mint;
+        verifier_mint_ = _verifier_mint;
         verifier_transfer_ = _verifier_transfer;
 
     }

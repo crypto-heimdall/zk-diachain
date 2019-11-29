@@ -1,8 +1,8 @@
 pragma solidity >= 0.4.25 < 0.6.0;
 
-import "./verifier.sol";    // Verifier : Transfer Circuit
+import "./Verifier_Mint.sol";    // Verifier : Transfer Circuit
 
-contract DiaNFT is Verifier {
+contract DiaNFT is Verifier_Mint {
 
     enum State {OnSale, OffSale, InProgress}
     mapping(bytes32 => State) public diamonds;

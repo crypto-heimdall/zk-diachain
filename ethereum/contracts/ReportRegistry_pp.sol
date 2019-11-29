@@ -28,7 +28,7 @@ contract ReportRegistry_pp is AnchorRegistry {
         string schema;
     }
 
-    event NewCommitment(address by, string  code);
+    event NewCommitment(address by, bytes32  code);
 
     // bytes32 - girdlecode / Commitment - precise-proof for Report
     mapping(bytes32 => Commitment) internal commitments;
@@ -55,7 +55,7 @@ contract ReportRegistry_pp is AnchorRegistry {
 
     // Data location must be "calldata" for parameter in external function, but "memory" was given.
     // !! Must be Checked : calldata vs memory indicator
-    function getAnchorById(bytes32 calldata _identifier) external view returns (bytes32, bytes32) {
+    function getAnchorById(bytes32 _identifier) external view returns (bytes32, bytes32) {
         return (_identifier, commitments[_identifier].documentRoot);
     }
 /*  Is it needed??

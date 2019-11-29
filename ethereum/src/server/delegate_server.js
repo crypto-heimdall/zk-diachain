@@ -90,7 +90,7 @@ app.post('/users', (req, res) => {
 
 app.post('/registerReport', async (req,res) => {
     const cut = req.body.cut;
-    const color = req.body.cut;
+    const color = req.body.color;
     const clarity = req.body.clarity;
     const carat = req.body.carat;
     const girdleCode = req.body.girdleCode;
@@ -112,6 +112,7 @@ app.post('/registerReport', async (req,res) => {
     precise_proof["reportHash"] = reporthash;
     precise_proof["schema"] = schema;
     precise_proof["reportUri"] = config.REPORT_URI;
+    precise_proof["girdleCode"] = base.utf8StringToHex(girdleCode, 32);
     
     console.log(precise_proof);
     return res.status(201).json(precise_proof);  
@@ -245,32 +246,29 @@ app.post('/storeReport', async(req, res) => {
               return;
         }
         var values = JSON.parse(data);
-        values.push(info_json);
+        console.log(values);
+        var exists = false;
+        values.forEach(function(value) {
+            if (value.reportRoot === reportRoot) {
+                exists = true;
+            }
+        })
 
-        req.cache.set (address, JSON.stringify(values), function(err, data) {
-            if (err) {
+        if (exists == false) {
+            values.push(info_json);
+
+            req.cache.set (address, JSON.stringify(values), function(err, data) {
+                if (err) {
                 console.log(err);
                 res.send("error: " + err);
                 return res.status(404);
-            }
+                }
+                return res.status(201).json(info_json); 
+            })
+        } else {
             return res.status(201).json(info_json); 
-        })
-    })
-
-/*
-    var array_info = [];
-    array_info.push(info_json);
-
-    //req.cache.set (address, JSON.stringify(info_json), function(err, data) {
-    req.cache.set (address, JSON.stringify(array_info), function(err, data) {
-        if (err) {
-            console.log(err);
-            res.send("error: " + err);
-            return res.status(404);
         }
-        return res.status(201).json(info_json); 
     })
-*/
 
 })
 
@@ -314,9 +312,16 @@ app.post('/storeNFT', async(req, res) => {
 
 
 })
+app.all('/*', function(req, res, next) {
+    console.log('ac');
+    
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    next();
+});
 
-app.listen(3000, () => {
-	console.log('Delegate Server listening on port 3000!');
+app.listen(3333, () => {
+	console.log('Delegate Server listening on port 3333!');
 });
 
 /* ===== using http ===== 
