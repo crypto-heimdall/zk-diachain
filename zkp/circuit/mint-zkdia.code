@@ -1,7 +1,7 @@
 // SecretNote..
 
 //import "LIBSNARK/sha256packed"
-import "hashes/sha256/512bitPacked" as sha256packed
+import "hashes/sha256/512bitPacked.code" as sha256packed
 
 // https://zokrates.github.io/sha256example.html#computing-a-hash-using-zokrates
 // A field value can only hold 254 bits due to the size of the underlying prime field used by zokrates. Therefore, 256 bit values need to be passed as 2 params of 128 bit values.

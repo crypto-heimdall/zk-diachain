@@ -15,6 +15,7 @@ const nft = require('../nf-token-controller');
 
 // boilerplate
 const config = require('../config');
+const redis = require('redis');
 
 const app = express();
 
@@ -153,7 +154,6 @@ app.post('/generateMintProof', async (req, res) => {
     return res.status(201).json(zkproof);
 })
 
-
 app.post('/generateTransferProof', async(req, res) => {
     const tokenId = req.body.tokenId;
     //const path = req.body.path;               // fetched in the controller!!
@@ -200,9 +200,120 @@ app.post('/generateTransferProof', async(req, res) => {
     
 })
 
+//==========================//
+
+const client = redis.createClient(6379, '127.0.0.1');
+app.use(function(req,res,next){
+    req.cache = client;
+    next();
+})
+
+app.get('/getInfos/:address', function(req, res, next) {
+    var key = req.params.address;
+    req.cache.get(key,function(err,data){
+        if(err){
+              console.log(err);
+              res.send("error "+err);
+              return;
+        }
+        var value = JSON.parse(data);
+        return res.status(201).json(value);
+   });
+})
+
+app.post('/storeReport', async(req, res) => {
+    const address = req.body.address;
+    const cut = req.body.cut;
+    const color = req.body.cut;
+    const clarity = req.body.clarity;
+    const carat = req.body.carat;
+    const girdleCode = req.body.girdleCode;
+    const reportRoot = req.body.reportRoot;
+
+    var info_json = {}
+    info_json.reportRoot = reportRoot;
+    info_json.cut = cut;
+    info_json.color = color;
+    info_json.clarity = clarity;
+    info_json.carat = carat;
+    info_json.girdleCode = girdleCode;
+
+    req.cache.get(address,function(err,data){
+        if(err){
+              console.log(err);
+              res.send("error "+err);
+              return;
+        }
+        var values = JSON.parse(data);
+        values.push(info_json);
+
+        req.cache.set (address, JSON.stringify(values), function(err, data) {
+            if (err) {
+                console.log(err);
+                res.send("error: " + err);
+                return res.status(404);
+            }
+            return res.status(201).json(info_json); 
+        })
+    })
+
+/*
+    var array_info = [];
+    array_info.push(info_json);
+
+    //req.cache.set (address, JSON.stringify(info_json), function(err, data) {
+    req.cache.set (address, JSON.stringify(array_info), function(err, data) {
+        if (err) {
+            console.log(err);
+            res.send("error: " + err);
+            return res.status(404);
+        }
+        return res.status(201).json(info_json); 
+    })
+*/
+
+})
+
+app.post('/storeNFT', async(req, res) => {
+    const address = req.body.address;
+    const reportRoot = req.body.reportRoot;
+    const tokenId = req.body.tokenId;
+    const commitment = req.body.commitment;
+    const commitmentIndex = req.body.commitmentIndex;
+
+    // Report_Root, Token_Id, Commitment, Commitment Index
+    req.cache.get(address,function(err,data){
+        if(err){
+              console.log(err);
+              res.send("error "+err);
+              return;
+        }
+        var values = JSON.parse(data);
+        var newValues = []
+        values.forEach(function(value){
+            console.log (value)
+            if (value.reportRoot === reportRoot ) {
+                value.tokenId = tokenId;
+                value.commitment = commitment;
+                value.commitmentIndex = commitmentIndex;
+                newValues.push(value);
+            } else {
+                newValues.push(value);
+            }
+        })
+
+        req.cache.set (address, JSON.stringify(newValues), function(err, data) {
+            if (err) {
+                console.log(err);
+                res.send("error: " + err);
+                return res.status(404);
+            }
+            return res.status(201).json(newValues); 
+        })
+   });    
 
 
-
+})
 
 app.listen(3000, () => {
 	console.log('Delegate Server listening on port 3000!');

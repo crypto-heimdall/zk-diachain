@@ -30,22 +30,22 @@ contract ReportRegistry_pp is AnchorRegistry {
 
     event NewCommitment(address by, string  code);
 
-    // string - girdlecode / Commitment - precise-proof for Report
-    mapping(string => Commitment) internal commitments;
-    string[] public girdleCodesLUT;     // reference from http://bit.ly/2Os0U7L
+    // bytes32 - girdlecode / Commitment - precise-proof for Report
+    mapping(bytes32 => Commitment) internal commitments;
+    bytes32[] public girdleCodesLUT;     // reference from http://bit.ly/2Os0U7L
 
     function size() public view returns (uint) {
         return girdleCodesLUT.length;
     }
 
-    function getCommitment(string memory girdleCode) public returns (Commitment memory) {
+    function getCommitment(bytes32 girdleCode) public returns (Commitment memory) {
         //require(commitments[girdleCode].merkleRoot != bytes32(0x0),"the given girdlecode NOT FOUND..");
         require(commitments[girdleCode].documentRoot != bytes32(0x0),"the given girdlecode NOT FOUND..");
         return commitments[girdleCode];
     }
 
     // documentRoot = Hash ( merkle root of precise proof || wholesaler's public key )
-    function register(string memory girdleCode, bytes32 documentRoot, string memory schema) public returns (bool) {
+    function register(bytes32 girdleCode, bytes32 documentRoot, string memory schema) public returns (bool) {
         require(commitments[girdleCode].documentRoot == bytes32(0x0), "the girdle code ALREADY Registered..");
         commitments[girdleCode] = Commitment(documentRoot, schema);
         girdleCodesLUT.push(girdleCode);
@@ -55,7 +55,7 @@ contract ReportRegistry_pp is AnchorRegistry {
 
     // Data location must be "calldata" for parameter in external function, but "memory" was given.
     // !! Must be Checked : calldata vs memory indicator
-    function getAnchorById(string calldata _identifier) external view returns (string memory, bytes32) {
+    function getAnchorById(bytes32 calldata _identifier) external view returns (bytes32, bytes32) {
         return (_identifier, commitments[_identifier].documentRoot);
     }
 /*  Is it needed??

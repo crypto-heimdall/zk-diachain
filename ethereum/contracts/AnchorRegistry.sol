@@ -4,7 +4,7 @@ import "openzeppelin-solidity/contracts/introspection/ERC165.sol";
 
 // crypto-heimdall : reference from [privacy-enabled-erc721]
 contract AnchorRegistry is ERC165 {
-  bytes4 internal constant InterfaceId_AnchorRegistry = 0x4d5222e1;
+  bytes4 internal constant InterfaceId_AnchorRegistry = 0x04d466b2;
   /*
    * 0x04d466b2 ===
    *   bytes4(keccak256('getAnchorById(bytes32)')) 
