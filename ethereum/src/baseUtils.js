@@ -1,5 +1,13 @@
 const hexToBinary = require('hex-to-binary');
 
+function ensure0x(hex='') {
+  const hexString = hex.toString();
+  if (typeof hexString === 'string' && hexString.indexOf('0x') !== 0) {
+      return `0x${hexString}`;
+  }
+  return hexString;
+}
+
 function strip0x(hex) {
     if (typeof hex === 'undefined') return '';
     if (typeof hex === 'string' && hex.indexOf('0x') === 0 ) {
