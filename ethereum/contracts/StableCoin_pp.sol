@@ -16,7 +16,7 @@ contract DiaStableCoin is Context, ERC20, ERC20Detailed {
     /**
      * @dev Constructor that gives _msgSender() all of existing tokens.
      */
-    constructor () public ERC20Detailed("DiaStableCoin", "DIA", 18) {
+    constructor () public ERC20Detailed("DiaStableCoin", "DIA", 3) {
         _mint(_msgSender(), 10000 * (10 ** uint256(decimals())));
     }
 }
