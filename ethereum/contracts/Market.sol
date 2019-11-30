@@ -2,6 +2,7 @@ pragma solidity >= 0.4.25 < 0.6.0;
 pragma experimental ABIEncoderV2;
 
 import './MockFundPool.sol';
+import './Pool.sol';
 
 contract Market {
 
@@ -20,6 +21,8 @@ contract Market {
         string carat;           // Public
 
         uint32 price;
+        bytes32 reportRoot;
+
         DiaStatus status;
     }
     uint private itemCount;
@@ -33,10 +36,10 @@ contract Market {
         itemCount = 0;
     }
 
-    function register(string memory cut, string memory color, string memory clarity, string memory carat, uint32 price) public {
-        RegisteredDiaList[itemCount] = OpenData(itemCount, cut, color, clarity, carat, price, DiaStatus.OffSale);
-
-        emit Register(itemCount++, cut, color, clarity, carat, price);
+    function register(string memory cut, string memory color, string memory clarity, string memory carat, bytes32 reportRoot, uint32 price) public {
+        RegisteredDiaList[itemCount] = OpenData(itemCount, cut, color, clarity, carat,  price, reportRoot, DiaStatus.OffSale);
+        itemCount++;
+        emit Register(itemCount-1, cut, color, clarity, carat, price);
     }
 /*
     function getDiamonds () public view returns (OpenData[] memory) {
@@ -48,44 +51,53 @@ contract Market {
         return dias;
     }
 */
-    function getDiamonds (uint from, uint end) public view returns
-            (string[] memory , string[] memory,string[] memory , string[] memory, uint[] memory, DiaStatus[] memory ) {
-        
-        if (from > itemCount)   from = itemCount;
-        if (end > itemCount)    end = itemCount + 1;
+    function getDiamond(uint itemId) public view returns(OpenData memory) {
+        for(uint i=0 ; i < itemCount ; i++) {
+            OpenData storage dia = RegisteredDiaList[i];
+            if (dia.itemId == itemId) {
+                return dia;
+            }
+        }
+    }
 
-        uint numItems = end - from;
+    function getDiamonds () public view returns
+            (uint[] memory , string[] memory , string[] memory,string[] memory , 
+            string[] memory, uint[] memory, bytes32[] memory, DiaStatus[] memory ) {
 
-        string[] memory cuts = new string[](numItems);
-        string[] memory colors = new string[](numItems);
-        string[] memory clarity = new string[](numItems);
-        string[] memory carat = new string[](numItems);
-        uint[] memory price = new uint[](numItems);
-        DiaStatus[] memory status = new DiaStatus[](numItems);
+        uint[] memory ids = new uint[] (itemCount);
+        string[] memory cuts = new string[](itemCount);
+        string[] memory colors = new string[](itemCount);
+        string[] memory clarity = new string[](itemCount);
+        string[] memory carat = new string[](itemCount);
+        uint[] memory price = new uint[](itemCount);
+        bytes32[] memory reportsHash = new bytes32[](itemCount);
+        DiaStatus[] memory status = new DiaStatus[](itemCount);
 
         //OpenData[] memory dias = new OpenData[](itemCount);
-        for (uint i = from; i < end; i++) {
+        for (uint i = 0; i < itemCount; i++) {
             OpenData storage dia = RegisteredDiaList[i];
+
+            ids[i] = dia.itemId;
             cuts[i] = dia.cut;
             colors[i] = dia.color;
             clarity[i] = dia.clarity;
             carat[i] = dia.carat;
-            
+            reportsHash[i] = dia.reportRoot;
             price[i] = dia.price;
             status[i] = dia.status;
         }
-        return (cuts, colors, clarity, carat, price, status);
+        return (ids, cuts, colors, clarity, carat, price, reportsHash, status);
     }
 
     function transitStatus (uint itemId, DiaStatus newStatus) public {
         RegisteredDiaList[itemId].status = newStatus;
     }
 
-    function changeDiamondStatus(uint itemId) public returns (bool) {
+    function rentDiamond(uint itemId) public returns (bool) {
         require(RegisteredDiaList[itemId].status == DiaStatus.OnSale, "The item is not onsale..");
         
         // Request deposit to FundPool
-        MockFundPool fp = MockFundPool(addrFundPool);
+        Pool fp = Pool(addrFundPool);
         if (fp.requestDeposit(itemId, RegisteredDiaList[itemId].price)) {
             // event Deposit(uint itemId, uint32 price, bool success);
             emit Deposit(itemId, RegisteredDiaList[itemId].price, true);

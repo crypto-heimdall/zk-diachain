@@ -152,7 +152,12 @@ async function generateCmdforMint( tokenId, ownerPublicKey, salt) {
 
     const publicInputHash = utils.concatenateThenHash(tokenId, commitment);
 
-    console.log('Computing proof with w=[pk_A, S_A] x=[A,z_A,1]');
+   console.log('publicInputHash : ', publicInputHash);
+   console.log('tokenId : ', tokenId);
+   console.log('ownerPublicKey : ', ownerPublicKey);
+   console.log('salt : ', salt);
+   console.log('commitment : ', commitment);
+   
     
     let proof;
     let witnesses = [
@@ -171,10 +176,11 @@ async function generateCmdforMint( tokenId, ownerPublicKey, salt) {
 
     witness = cv.computeVectors(witnesses);
 
-    let cmd = './zokrates compute-witness -a ';
+    let cmd = 'zokrates compute-witness -a ';
     witness.forEach( p => {
         cmd += `${new BN(p,10).toString(10)} `
     });
+    cmd += ' >> witness.log';
     
     let retValue = {};
     retValue.cmd = cmd;

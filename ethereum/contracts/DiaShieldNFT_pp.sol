@@ -67,13 +67,17 @@ depth row  width  st#     end#
     event Mint(address from, address to, bytes32 token_id, bytes32 commitment, uint256 commitment_index);
     event Transfer(bytes32 nullifier, bytes32 commitment, uint256 commitment_index);
     
-    constructor(address _anchorRegistry, address _verifier_mint, address _verifier_transfer) public {
-        require(ReportRegistry_pp(_anchorRegistry).supportsInterface(InterfaceId_AnchorRegistry), "Not a Valid Report Registry..");
+//    constructor(address _anchorRegistry, address _verifier_mint, address _verifier_transfer) public {
+    constructor(address _anchorRegistry) public {
+        //require(ReportRegistry_pp(_anchorRegistry).supportsInterface(InterfaceId_AnchorRegistry), "Not a Valid Report Registry..");
+        
         anchorRegistry_ = _anchorRegistry;
 
         // set up verifier for zkp
+        /*
         verifier_mint_ = _verifier_mint;
         verifier_transfer_ = _verifier_transfer;
+        */
 
     }
 
@@ -91,12 +95,14 @@ depth row  width  st#     end#
     function mint (uint256[] calldata _proof, uint256[] calldata _inputs,
                         bytes32 _reportRoot, bytes32 _tokenId, bytes32 _commitment ) external {
 
+/* === Temp!!!
         require(_isRegisteredInRegistery(_tokenId, _reportRoot), "Report Root needs to be registered in the registry..");
 
         // Check that the publicInputHash equals the hash of the 'public inputs'
         bytes31 publicInputHash = bytes31(bytes32(_inputs[0])<<8);
         bytes31 publicInputHashCheck = bytes31(sha256(abi.encodePacked(_tokenId, _commitment)));
         require(publicInputHash == publicInputHashCheck, "publicInputHash cannot be reconciled");
+*/
 
         // verify the proof
             //address internal verifier_mint_;
